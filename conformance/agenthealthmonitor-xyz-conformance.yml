@@ -1,0 +1,154 @@
+generated: '2026-09-19'
+method: searched
+source: https://docs.agenthealthmonitor.xyz/#gs-standards (Ecosystem & Standards) + live probes 2026-09-19
+derived_from:
+- openapi/agenthealthmonitor-xyz-openapi.yml
+- openapi/agenthealthmonitor-xyz-verify-openapi.yml
+- well-known/agenthealthmonitor-xyz-x402.json
+- well-known/agenthealthmonitor-xyz-agent-registration.json
+- a2a/agenthealthmonitor-xyz-agent-card.json
+docs:
+- https://docs.agenthealthmonitor.xyz/
+- https://github.com/moonshot-cyber/agent-health-monitor#readme
+summary: 'Agent Health Monitor''s conformance profile is the agent-economy / on-chain stack rather than the enterprise one:
+  x402 v2 pay-per-call is VERIFIED live (HTTP 402 + PAYMENT-REQUIRED header on every paid route, plus a /.well-known/x402
+  discovery document), an ERC-8004 registration-v1 file is served at /.well-known/agent-registration.json, network identifiers
+  use CAIP-2 (eip155:8453) and the contracts are OpenAPI 3.1.0. The A2A card exists but grades flavored and its endpoint is
+  not deployed. ERC-8183 and ERC-8210 involvement is documented prose (an evaluator worker on Arc testnet; "aligned with"
+  ERC-8210) and is recorded as claimed, not verified. Nothing enterprise-grade is published: no SOC 2 / ISO 27001 / GDPR statement,
+  no trust center, no terms of service or privacy policy page, no RFC 9116 security.txt, no OAuth/OIDC, and errors use the
+  FastAPI {"detail"} envelope rather than RFC 9457. No Compliance pointer is emitted.'
+standards:
+- id: x402
+  name: x402 payment protocol
+  version: 2 (x402Version 2)
+  conforms: true
+  verification: probed
+  evidence: GET https://agenthealthmonitor.xyz/risk/0x…0001 without payment -> HTTP 402, body {}, PAYMENT-REQUIRED header
+    decoding to {x402Version 2, resource{url,description,mimeType}, accepts[{scheme exact, network eip155:8453, asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913,
+    amount 1000, payTo 0xaD64EFCe9CfeE4d1D1701d9a0009CCa72B9ff000, maxTimeoutSeconds 300}], extensions.bazaar}. Same shape
+    on PUT /ahs/route/policy and on POST https://verify.agenthealthmonitor.xyz/v1/outputs (amount 500000). Discovery document
+    at /.well-known/x402 lists 15 resources with facilitator https://facilitator.payai.network. The docs page says "x402-native.
+    All 14 endpoints support x402 micropayments (USDC on Base)".
+  domain_standard_signature: true
+- id: x402-bazaar-discovery
+  name: x402 Bazaar discovery extension
+  conforms: true
+  verification: probed
+  evidence: Every 402 challenge and every /.well-known/x402 endpoint entry carries extensions.bazaar.info {input{type http,
+    method, discoverable true, queryParams}, output{type json, example, schema}}.
+- id: erc-8004
+  name: ERC-8004 Trustless Agents — registration file
+  conforms: true
+  verification: probed
+  evidence: '/.well-known/agent-registration.json (200) with type https://eips.ethereum.org/EIPS/eip-8004#registration-v1,
+    name, description, image and services[] {web, x402}. Docs and README name the on-chain identity as ERC-8004 #32328 (https://8004scan.io).
+    The OpenAPI declares the route (agent_registration__well_known_agent_registration_json_get). On-chain registration itself
+    was not verified by this pipeline.'
+  domain_standard_signature: true
+- id: caip-2
+  name: CAIP-2 chain identifiers
+  conforms: true
+  verification: probed
+  evidence: x402 accepts[].network and /.well-known/x402 payment[].network are "eip155:8453" (Base mainnet); the README documents
+    NETWORK as a CAIP-2 id.
+- id: eip-3009
+  name: EIP-3009 transferWithAuthorization (USDC)
+  conforms: true
+  verification: inferred
+  evidence: The x402 "exact" scheme on an EVM network settles with an EIP-3009 authorization on the named asset (USDC 0x8335…2913,
+    extra {name "USD Coin", version "2"} = the EIP-712 domain). Inferred from the scheme, not separately tested.
+- id: a2a
+  name: Agent2Agent protocol agent card
+  version: 1.0.0
+  conforms: false
+  verification: probed
+  evidence: Card served at the legacy path /.well-known/agent.json (200); graded FLAVORED in a2a/agenthealthmonitor-xyz-a2a.yml
+    — no top-level protocolVersion, supportedInterfaces instead of additionalInterfaces, and the declared endpoint https://agenthealthmonitor.xyz/a2a
+    answers 404 to GET and JSON-RPC POST. Recorded as not conformant; the card is real.
+- id: openapi-3.1
+  name: OpenAPI 3.1.0
+  conforms: true
+  verification: probed
+  evidence: https://agenthealthmonitor.xyz/openapi.json (74 paths, every operation with summary, description, operationId
+    and tags; 53 component schemas) and https://verify.agenthealthmonitor.xyz/openapi.json (4 paths). Both FastAPI-generated;
+    neither declares servers[] or securitySchemes.
+- id: json-schema-2020-12
+  name: JSON Schema 2020-12 (via OpenAPI 3.1)
+  conforms: true
+  verification: derived
+  evidence: OpenAPI 3.1 schema dialect; component schemas use anyOf/null unions and examples[] (Pydantic v2 output).
+- id: erc-8183
+  name: ERC-8183 Agentic Commerce — on-chain evaluator
+  conforms: null
+  verification: claimed
+  evidence: 'Docs: "AHM operates as a live evaluator" for ERC-8183 JobSubmitted events on Arc testnet, calling complete()/reject()
+    from the AHS grade; the OpenAPI exposes GET /erc8183/status (X-Internal-Key). Prose + admin route only; not observable
+    anonymously.'
+- id: erc-8210
+  name: ERC-8210 Agent Assurance
+  conforms: null
+  verification: claimed
+  evidence: 'Docs: AHM Verify "is aligned with the structured verification output schema being developed under ERC-8210" and
+    the scoring architecture "is aligned with the IRiskHook interface and IIndependenceSignal patterns". Alignment claim about
+    a draft standard; nothing testable.'
+- id: w3c-verifiable-credentials
+  name: W3C Verifiable Credentials (VCDM 2.0)
+  conforms: null
+  verification: claimed
+  evidence: The agent card advertises a verifiable_credential_issuance skill and an application/vc+ld+json output mode; the
+    provider's ECOSYSTEM.md carries a sample trust-score VC. No public issuance operation exists in either OpenAPI.
+- id: oasf
+  name: OASF agent record (agntcy Agent Directory)
+  conforms: null
+  verification: claimed
+  evidence: docs/ecosystem/oasf-record.json in the public source repo; publishing it via `agntcy dir publish` is listed as
+    a to-do in ECOSYSTEM.md.
+- id: oauth2
+  conforms: false
+  verification: probed
+  evidence: 'No OAuth: neither OpenAPI declares securitySchemes; auth is X-API-Key or x402; /.well-known/oauth-authorization-server
+    and /.well-known/oauth-protected-resource are 404 on every host.'
+- id: oidc-discovery
+  conforms: false
+  verification: probed
+  evidence: /.well-known/openid-configuration 404 on every host.
+- id: rfc9728-protected-resource-metadata
+  conforms: false
+  verification: probed
+  evidence: /.well-known/oauth-protected-resource 404 on apex, verify, blog, intelligence; SPA shell on docs.
+- id: rfc9727-api-catalog
+  conforms: false
+  verification: probed
+  evidence: /.well-known/api-catalog 404 on every host.
+- id: rfc9116-security-txt
+  conforms: false
+  verification: probed
+  evidence: /.well-known/security.txt and /security.txt 404 on every host.
+- id: rfc9457-problem-details
+  conforms: false
+  verification: derived
+  evidence: 'Errors are the FastAPI envelope {"detail": string | ValidationError[]} and a custom 429 {"error","detail"}; no
+    application/problem+json, no type/title/instance. See errors/agenthealthmonitor-xyz-problem-types.yml.'
+- id: rfc8594-sunset
+  conforms: false
+  verification: derived
+  evidence: No Sunset/Deprecation headers or deprecated operations; no deprecation policy page.
+- id: idempotency-key
+  conforms: false
+  verification: derived
+  evidence: No Idempotency-Key header or parameter anywhere in either contract (0 matches for /idempot/i).
+- id: mcp
+  name: Model Context Protocol
+  conforms: false
+  verification: probed
+  evidence: No MCP endpoint (/mcp 404, mcp. host does not resolve) and no package; see mcp/agenthealthmonitor-xyz-mcp.yml.
+- id: llms-txt
+  conforms: false
+  verification: probed
+  evidence: /llms.txt 404 on apex, blog, verify, intelligence; SPA shell on docs.
+- id: soc2
+  conforms: false
+  verification: searched
+  evidence: No SOC 2, ISO 27001, GDPR, HIPAA or PCI statement on any AHM page, PDF or README; no trust center; /security and
+    /trust 404.

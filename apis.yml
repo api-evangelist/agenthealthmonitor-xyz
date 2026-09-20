@@ -1,23 +1,213 @@
 aid: agenthealthmonitor-xyz
 name: Digital Intensity Ltd
-description: 'Digital Intensity Ltd is a company surfaced via the API Evangelist harvest backlog (source:
-  a2a-registry) and added to the network as a stub for full-pipeline profiling.'
+description: 'Digital Intensity Ltd operates Agent Health Monitor (AHM, agenthealthmonitor.xyz), trust and health verification
+  for autonomous agents on Base L2. Fourteen pay-per-call REST endpoints score any agent wallet: quick and premium risk scores
+  (Nansen labels), health and wash diagnostics, the 0-100 Agent Health Score with A-F grades, tiered trust routing (instant_settle
+  / escrow / reject) for payment middleware, gas optimisation, ready-to-sign retry transactions, 30-day webhook alerts and
+  an all-in-one protection run, priced $0.001 to $25.00 per call. Agents pay per call in USDC over x402 (HTTP 402 + PAYMENT-REQUIRED,
+  discovery at /.well-known/x402); humans buy an X-API-Key credit pack via Stripe ($9 / $39 one-time, $99/month). Published
+  as OpenAPI 3.1.0, open source (MIT) on GitHub, with the ahm-shield Python SDK. AHM Verify scores delivered agent output
+  at $0.50 per verdict. AHM also serves an ERC-8004 registration file, a legacy-path A2A agent card and a public roadmap.'
 url: https://raw.githubusercontent.com/api-evangelist/agenthealthmonitor-xyz/refs/heads/main/apis.yml
+image: https://agenthealthmonitor.xyz/static/ahm-logo.png
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
+x-brands:
+- Agent Health Monitor
+- AHM
+- AHM Shield
+- AHM Verify
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Agents
+- Agent Trust
+- Risk Scoring
+- Wallet Intelligence
+- Blockchain
+- Base
+- x402
+- Agentic Commerce
+- Monitoring
+- Webhooks
+- Web3
+- Verifiable Credentials
+- Developer Tools
+- agent-native
+tags_raw:
+- Agents
+- Agent trust
+- Risk scoring
+- Wallet intelligence
+- Blockchain
+- Base
+- x402
+- Agentic commerce
+- Monitoring
+- Webhooks
+- Web3
+- Verifiable credentials
+- Developer tools
+- Agent-native
+apis:
+- aid: agenthealthmonitor-xyz:agent-health-monitor-api
+  name: Agent Health Monitor API
+  description: REST API for agent-wallet trust and health on Base L2, published as OpenAPI 3.1.0 (v1.8.0) at https://agenthealthmonitor.xyz/openapi.json
+    — 74 paths / 76 operations across Scoring & Risk (/risk, /risk/premium, /counterparties, /network-map), Health & Hygiene
+    (/health, /wash, /ahs, /ahs/route, /ahs/route/policy, /ahs/batch, /report-card), Optimization (/optimize, /retry + free
+    preview), Protection (/agent/protect + free preview), Alerts (subscribe / configure / status / unsubscribe with Slack,
+    Discord or generic webhooks), plus discovery/info, partner coupon, Stripe billing and X-Internal-Key admin routes. Paid
+    routes answer HTTP 402 with an x402 v2 PAYMENT-REQUIRED challenge (USDC on eip155:8453) unless an X-API-Key is sent. The
+    spec declares no servers[] or securitySchemes; the base URL comes from the docs.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  image: https://agenthealthmonitor.xyz/static/ahm-logo.png
+  baseURL: https://agenthealthmonitor.xyz
+  tags:
+  - Agents
+  - Risk Scoring
+  - Wallet Intelligence
+  - x402
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-openapi.yml
+  - type: OpenAPI
+    name: Agent Health Monitor OpenAPI 3.1 (provider-hosted)
+    url: https://agenthealthmonitor.xyz/openapi.json
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    name: Swagger UI
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Overlay
+    url: overlays/agenthealthmonitor-xyz-openapi-overlay.yaml
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: MCPServer
+    url: mcp/agenthealthmonitor-xyz-mcp.yml
+  x-base-url-note: 'repair-api-bases.py flags this base as marketing-base-present because it equals the website root. That
+    is the deployed truth, not a placeholder: the README states "Base URL https://agenthealthmonitor.xyz", the docs quick-start
+    calls https://agenthealthmonitor.xyz/ahs/{address}, every resource in /.well-known/x402 is an apex URL, and live 402/200
+    responses were observed on apex paths on 2026-09-19. There is no api. host (api.agenthealthmonitor.xyz does not resolve).'
+- aid: agenthealthmonitor-xyz:ahm-verify-api
+  name: AHM Verify API
+  description: 'Post-transaction output-quality scoring: register a job specification (POST /v1/specs, free), submit an agent''s
+    delivered output for evaluation by a six-role adversarial Claude panel (POST /v1/outputs, $0.50 USDC per verdict via x402
+    — a live 402 was observed), and poll the verdict (GET /v1/verdicts/{verdict_id}) for ALLOW / HOLD / REJECT with confidence
+    and findings. Published as OpenAPI 3.1.0 (v0.1.0) at https://verify.agenthealthmonitor.xyz/openapi.json with Swagger UI
+    at /docs and a /health endpoint; separate from the AHS composite.'
+  humanURL: https://agenthealthmonitor.xyz/verify
+  image: https://agenthealthmonitor.xyz/static/ahm-logo.png
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Agents
+  - Evaluation
+  - x402
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-verify-openapi.yml
+  - type: OpenAPI
+    name: AHM Verify OpenAPI 3.1 (provider-hosted)
+    url: https://verify.agenthealthmonitor.xyz/openapi.json
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    name: Swagger UI
+    url: https://verify.agenthealthmonitor.xyz/docs
+  - type: Overlay
+    url: overlays/agenthealthmonitor-xyz-verify-openapi-overlay.yaml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/agenthealthmonitor-xyz-agentic-access.yml
 - type: Website
   url: https://agenthealthmonitor.xyz/
+- type: DeveloperPortal
+  url: https://docs.agenthealthmonitor.xyz/
+- type: Documentation
+  url: https://docs.agenthealthmonitor.xyz/
+- type: APIReference
+  url: https://agenthealthmonitor.xyz/docs
+- type: GettingStarted
+  url: https://docs.agenthealthmonitor.xyz/#getting-started
+- type: Console
+  name: Developer app — run any endpoint pay-per-call
+  url: https://agenthealthmonitor.xyz/app
+- type: Pricing
+  url: https://docs.agenthealthmonitor.xyz/#pricing
+- type: SignUp
+  name: Buy an API key (Stripe)
+  url: https://agenthealthmonitor.xyz/pay-by-card
+- type: Roadmap
+  url: https://agenthealthmonitor.xyz/roadmap
+- type: Blog
+  url: https://blog.agenthealthmonitor.xyz/
+- type: Support
+  name: Contact / design partner programme
+  url: https://docs.agenthealthmonitor.xyz/#design-partner
+- type: GitHubOrganization
+  url: https://github.com/moonshot-cyber
+- type: SourceCode
+  name: Agent Health Monitor API source (MIT)
+  url: https://github.com/moonshot-cyber/agent-health-monitor
+- type: OpenAPI
+  url: openapi/agenthealthmonitor-xyz-openapi.yml
+- type: AgentCard
+  url: a2a/agenthealthmonitor-xyz-a2a.yml
+- type: AgentCard
+  name: A2A agent card (provider-hosted, legacy path)
+  url: https://agenthealthmonitor.xyz/.well-known/agent.json
+- type: MCPServer
+  url: mcp/agenthealthmonitor-xyz-mcp.yml
+- type: WellKnown
+  url: well-known/agenthealthmonitor-xyz-well-known.yml
+- type: LLMsTxt
+  url: llms/agenthealthmonitor-xyz-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Packages
+  url: packages/agenthealthmonitor-xyz-packages.yml
+- type: SDKs
+  url: packages/agenthealthmonitor-xyz-packages.yml
+- type: Authentication
+  url: authentication/agenthealthmonitor-xyz-authentication.yml
+- type: Conventions
+  url: conventions/agenthealthmonitor-xyz-conventions.yml
+- type: ErrorCatalog
+  url: errors/agenthealthmonitor-xyz-problem-types.yml
+- type: DataModel
+  url: data-model/agenthealthmonitor-xyz-data-model.yml
+- type: RateLimits
+  url: rate-limits/agenthealthmonitor-xyz-rate-limits.yml
+- type: Plans
+  url: plans/agenthealthmonitor-xyz-plans-pricing.yml
+- type: Conformance
+  url: conformance/agenthealthmonitor-xyz-conformance.yml
+- type: Lifecycle
+  url: lifecycle/agenthealthmonitor-xyz-lifecycle.yml
+- type: Webhooks
+  url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+- type: DomainSecurity
+  url: security/agenthealthmonitor-xyz-domain-security.yml
+- type: RegulatoryPosture
+  url: regulatory/agenthealthmonitor-xyz-regulatory-posture.yml
+x-pointer-liveness:
+  checked: '2026-09-19'
+  note: Every http(s) pointer in this file was fetched on 2026-09-19 and returned 200 (docs.agenthealthmonitor.xyz is one
+    page; fragment pointers resolve to it). https://x.com/agenttrust (linked from the docs page) returned 404 to an unauthenticated
+    fetch and was NOT emitted. https://verify.agenthealthmonitor.xyz/ root returns the FastAPI 404 envelope because the host
+    is API-only; its /openapi.json, /docs and /health are 200.
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 32
+  pass: local-v3

@@ -1,0 +1,84 @@
+generated: '2026-09-19'
+method: searched
+source: 'openapi/agenthealthmonitor-xyz-openapi.yml (Alerts tag: subscribe_alerts_alerts_subscribe__address__get, configure_alerts_alerts_configure_post,
+  alert_status_alerts_status__address__get, unsubscribe_alerts_alerts_unsubscribe__address__delete; ConfigureRequest, AlertThresholds,
+  TestWebhookRequest schemas) + https://github.com/moonshot-cyber/agent-health-monitor#5-alert-monitoring-200month--stay-on-top-of-it
+  + send_webhook() in the public api.py'
+spec_type: webhook-catalog
+asyncapi_published: false
+docs:
+- https://github.com/moonshot-cyber/agent-health-monitor#readme
+- https://docs.agenthealthmonitor.xyz/#endpoints (GET /alerts/subscribe/{address} — "Automated monitoring + webhooks")
+summary: 'Agent Health Monitor publishes no AsyncAPI document (no /asyncapi.yaml or .json on any host, nothing in the source
+  repo), so none is saved and none is fabricated. It does ship one real outbound webhook surface: paid alert subscriptions
+  ($2.00 USDC or 1 credit per 30 days per wallet) that run a health check every 6 hours and POST to a caller-supplied webhook_url
+  when thresholds are breached, in a Slack, Discord or generic-JSON shape. The payload shape below is read from the provider''s
+  open-source send_webhook() because no docs page declares it. Deliveries are unsigned, fire-and-forget (10 s timeout, one
+  attempt, failures only logged) — there is no retry, no signature header and no delivery log an agent can pull, other than
+  alerts_sent / last_alert_at on GET /alerts/status/{address}.'
+delivery:
+  transport: HTTPS POST (httpx, 10 s timeout) to the subscription's webhook_url
+  signing: null
+  retries: null
+  pull_backstop: GET /alerts/status/{address} (free) returns thresholds, last_check_at, last_alert_at, alerts_sent
+  cadence: health checks every 6 hours for 30 days per paid subscription (extends by 30 days on re-subscribe)
+  url_policy: webhook_url must be public http(s); private, loopback, link-local, reserved IPs, localhost, *.internal, *.local
+    and metadata.google.internal are refused (400)
+  schema_published: false
+setup_flow:
+- step: 1
+  operation: subscribe_alerts_alerts_subscribe__address__get
+  method: GET
+  path: /alerts/subscribe/{address}
+  price: $2.00 USDC (x402) or 1 API-key credit
+  effect: activates 30 days of monitoring
+- step: 2
+  operation: configure_alerts_alerts_configure_post
+  method: POST
+  path: /alerts/configure
+  price: free
+  body:
+    address: 0x…
+    webhook_url: https://…
+    webhook_type: generic | slack | discord (default generic)
+    thresholds:
+      health_score: alert when below (README example 70)
+      failure_rate: alert when above, percent (example 30)
+      waste_usd: alert when above (example 50)
+- step: check
+  operation: alert_status_alerts_status__address__get
+  method: GET
+  path: /alerts/status/{address}
+  price: free
+- step: stop
+  operation: unsubscribe_alerts_alerts_unsubscribe__address__delete
+  method: DELETE
+  path: /alerts/unsubscribe/{address}
+  price: free
+- step: test
+  operation: stripe_webhook_test_stripe_webhook_test_post
+  note: POST /stripe/webhook/test (TestWebhookRequest) is a Billing-tag test hook for the provider's own Stripe integration,
+    not a customer alert test.
+channels:
+  agent-health-alert:
+    direction: outbound
+    trigger: a monitored wallet breaches a configured threshold during a 6-hourly check
+    payloads:
+      generic:
+        content_type: application/json
+        shape:
+          address: string — the monitored wallet
+          timestamp: ISO 8601 UTC (YYYY-MM-DDTHH:MM:SSZ)
+          alerts:
+          - type: string — threshold that fired
+            message: string — human-readable detail
+      slack:
+        shape:
+          text: '*Agent Health Alert* — `<address>`\n• *<type>*: <message> …'
+      discord:
+        shape:
+          content: '**Agent Health Alert** — `<address>`\n• **<type>**: <message> …'
+    source: send_webhook() in api.py (public source, read 2026-09-19); not declared in the OpenAPI
+inbound_webhooks:
+  note: POST /stripe/webhook (Billing) receives Stripe events for API-key fulfilment — the provider consuming a third party's
+    webhooks, not an event surface it offers.

@@ -64,5 +64,11 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Digital Intensity Ltd is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://agenthealthmonitor.xyz/
+Digital Intensity Ltd operates Agent Health Monitor (AHM) — trust and health verification for autonomous agents on Base L2: fourteen pay-per-call REST endpoints (risk scores, health and wash diagnostics, the 0–100 Agent Health Score, tiered trust routing, gas optimisation, retry transactions, webhook alerts) paid per call in USDC over x402 or with a Stripe-bought X-API-Key, plus AHM Verify for output-quality verdicts. Published as OpenAPI 3.1.0 and open source (MIT).
+
+- Website: https://agenthealthmonitor.xyz/
+- Documentation: https://docs.agenthealthmonitor.xyz/
+- OpenAPI: https://agenthealthmonitor.xyz/openapi.json (copy in `openapi/`)
+- AHM Verify OpenAPI: https://verify.agenthealthmonitor.xyz/openapi.json
+- x402 discovery: https://agenthealthmonitor.xyz/.well-known/x402
+- Source: https://github.com/moonshot-cyber/agent-health-monitor

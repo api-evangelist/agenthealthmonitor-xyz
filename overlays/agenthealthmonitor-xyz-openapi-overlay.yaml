@@ -1,0 +1,319 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Agent Health Monitor API
+  version: 1.0.0
+  description: Enhancements API Evangelist applies on top of the provider-served OpenAPI (https://agenthealthmonitor.xyz/openapi.json,
+    info.version 1.8.0), which declares no servers[], no securitySchemes and no 401/402/429 responses even though every paid
+    route answers 402 with an x402 PAYMENT-REQUIRED header and accepts an X-API-Key header. Nothing here changes the harvested
+    original in openapi/_original/. Prices are copied from the provider's own /.well-known/x402 document and /api/info.
+extends: openapi/agenthealthmonitor-xyz-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: agenthealthmonitor-xyz
+    x-apievangelist-source: https://agenthealthmonitor.xyz/openapi.json
+    x-apievangelist-fetched: '2026-09-19'
+- target: $.servers
+  description: Base URL stated in the provider docs and README
+  update:
+  - url: https://agenthealthmonitor.xyz
+    description: Production (Base mainnet, eip155:8453)
+- target: $.components
+  description: Security schemes the provider documents but the spec omits
+  update:
+    securitySchemes:
+      ApiKeyAuth:
+        type: apiKey
+        in: header
+        name: X-API-Key
+        description: 'Fiat API key bought via Stripe (Starter $9 / Pro $39 one-time credit packs, Unlimited $99/month). Key
+          prefix ahm_live_ (README) — the docs quick-start shows ahm_sk_. Keys can be exhausted: 429 "API key calls exhausted".'
+      X402Payment:
+        type: apiKey
+        in: header
+        name: X-PAYMENT
+        description: x402 v2 pay-per-call. Without payment the paid routes answer HTTP 402 with a base64 PAYMENT-REQUIRED
+          header carrying accepts[] {scheme exact, network eip155:8453, asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (USDC),
+          amount, payTo, maxTimeoutSeconds 300}; sign the EIP-3009 authorization and resend with X-PAYMENT. Facilitator https://facilitator.payai.network.
+    responses:
+      PaymentRequired:
+        description: x402 payment required (or X-API-Key missing). Body is {} ; the challenge is in the PAYMENT-REQUIRED response
+          header (base64 JSON).
+        headers:
+          PAYMENT-REQUIRED:
+            schema:
+              type: string
+            description: 'base64-encoded x402 v2 challenge: {x402Version, error, resource{url,description,mimeType}, accepts[],
+              extensions.bazaar}'
+      Unauthorized:
+        description: Invalid or expired API key / X-Internal-Key required
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                detail:
+                  type: string
+            examples:
+              invalidKey:
+                value:
+                  detail: Invalid or expired API key
+              missingKey:
+                value:
+                  detail: X-API-Key header required
+      TooManyRequests:
+        description: Per-IP rate limit (slowapi, 60/20/10 per minute by route) or API-key credits exhausted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                detail:
+                  type: string
+            examples:
+              ipLimit:
+                value:
+                  error: Rate limit exceeded
+                  detail: 60 per 1 minute
+              creditsExhausted:
+                value:
+                  detail: API key calls exhausted
+- target: $.tags
+  description: Mark the tags an agent may call versus internal/partner surfaces
+  update:
+  - name: Scoring & Risk
+    x-agent-callable: true
+  - name: Health & Hygiene
+    x-agent-callable: true
+  - name: Optimization
+    x-agent-callable: true
+  - name: Protection
+    x-agent-callable: true
+  - name: Alerts
+    x-agent-callable: true
+  - name: Coupon Access
+    x-agent-callable: false
+    description: Partner coupon routes
+  - name: Discovery & Info
+    x-agent-callable: false
+    description: HTML pages and service-info routes
+  - name: Billing
+    x-agent-callable: false
+    description: Stripe checkout and webhook routes
+  - name: Admin
+    x-agent-callable: false
+    description: X-Internal-Key protected
+  - name: Utility
+    x-agent-callable: false
+- target: $.paths['/risk/premium/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.05
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/counterparties/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.10
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/network-map/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.10
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/risk/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.001
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/health/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.50
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/wash/{address}'].post
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.50
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/ahs/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $1.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/ahs/route/policy'].put
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.01
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/ahs/route/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $0.01
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/ahs/batch'].post
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $10.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/report-card/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: '2.00'
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/optimize/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $5.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/agent/protect/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $25.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/retry/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $10.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+- target: $.paths['/alerts/subscribe/{address}'].get
+  update:
+    security:
+    - X402Payment: []
+    - ApiKeyAuth: []
+    x-x402-price: $2.00
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        $ref: '#/components/responses/PaymentRequired'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'

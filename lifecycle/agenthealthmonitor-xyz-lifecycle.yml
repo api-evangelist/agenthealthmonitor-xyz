@@ -1,0 +1,88 @@
+generated: '2026-09-19'
+method: searched
+source: https://docs.agenthealthmonitor.xyz/ + https://agenthealthmonitor.xyz/roadmap + https://agenthealthmonitor.xyz/api/info
+  + https://verify.agenthealthmonitor.xyz/health + github.com/moonshot-cyber/agent-health-monitor (public source, pushed 2026-09-02)
+versioning:
+  scheme: none (unversioned paths on the main API; /v1/ prefix on AHM Verify)
+  current: 1.8.0 (main API, OpenAPI info.version and /api/info); 0.1.0 (AHM Verify, /health)
+  base: https://agenthealthmonitor.xyz
+  policy: null
+  docs: null
+  note: No version header, no date pinning, no stated compatibility policy. The main API's paths are unversioned; the spec
+    version increments (1.8.0 on 2026-09-19) are the only visible versioning. AHM Verify uses a /v1/ path prefix.
+deprecation:
+  policy_documented: false
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  deprecated_operations: []
+  note: 'No deprecation policy anywhere on the site, PDFs or README; no operation carries deprecated: true in either OpenAPI;
+    no Sunset/Deprecation headers observed. No Deprecation pointer is emitted.'
+status_page:
+  url: null
+  probed:
+  - url: https://agenthealthmonitor.xyz/status
+    status: 404
+    checked: '2026-09-19'
+  - url: https://status.agenthealthmonitor.xyz/
+    status: no DNS
+    checked: '2026-09-19'
+  health_endpoints:
+  - url: https://agenthealthmonitor.xyz/up
+    status: 200
+    body: '{"status":"ok"}'
+    note: Declared in the OpenAPI as up_up_get (Utility tag).
+  - url: https://verify.agenthealthmonitor.xyz/health
+    status: 200
+    body: '{"status":"ok","service":"ahm-verify","version":"0.1.0"}'
+  note: No status page; two liveness endpoints exist and the /verify page polls the Verify one client-side ("SERVICE STATUS
+    // LIVE HEALTH CHECK"). No StatusPage pointer is emitted.
+sla:
+  url: null
+  uptime_target: null
+  note: No SLA published. The AHM Shield Enterprise tier ($299/month) lists "SLA + dedicated support" as a feature, but no
+    SLA document, uptime target or credit terms are published anywhere.
+changelog:
+  url: null
+  note: No dated changelog. The roadmap page is stamped "AHM ROADMAP v2 · AUGUST 2026" and lists LIVE / BUILDING / NEXT /
+    FUTURE tracks; the public GitHub repo history is the only change record.
+roadmap:
+  url: https://agenthealthmonitor.xyz/roadmap
+  status: 200
+  checked: '2026-09-19'
+  tracks:
+    live:
+    - Agent Diagnostics (14 endpoints)
+    - AHM Verify
+    building:
+    - Ecosystem Intelligence — proactive scanning, behavioural baselines, temporal intelligence, ERC-8183 evaluator, session
+      continuity
+    next:
+    - Agent Governance Infrastructure — agent title reports, compromise detection, standards assessment
+    future:
+    - Trust & Certification — agent certification, trust registry, agent power index, agent insurance
+support_lifetime:
+  stated_period: null
+  note: No support period or end-of-life commitment is published.
+legal:
+  terms_of_service: null
+  privacy_policy: null
+  probed:
+  - url: https://agenthealthmonitor.xyz/terms
+    status: 404
+  - url: https://agenthealthmonitor.xyz/privacy
+    status: 404
+  - url: https://agenthealthmonitor.xyz/legal
+    status: 404
+  - url: https://agenthealthmonitor.xyz/tos
+    status: 404
+  - url: https://agenthealthmonitor.xyz/privacy-policy
+    status: 404
+  note: No terms of service or privacy policy is linked from any page footer or the docs, and none exists at conventional
+    paths. Payments are taken (Stripe payment links, x402) without published terms.
+source_code:
+  url: https://github.com/moonshot-cyber/agent-health-monitor
+  license: MIT (README; no LICENSE file)
+  last_push: '2026-09-02'
+  created: '2026-02-16'
+  note: The whole API is open source and self-hostable (uvicorn api:app, port 4021).

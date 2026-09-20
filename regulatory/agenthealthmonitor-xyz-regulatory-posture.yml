@@ -1,0 +1,48 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+sources_checked:
+- well-known/agenthealthmonitor-xyz-well-known.yml (no security.txt on any host)
+- security/ (no trust center or disclosure page found by probe-security-programs.py)
+- lifecycle/agenthealthmonitor-xyz-lifecycle.yml (no support period, no terms, no privacy policy)
+- conformance/agenthealthmonitor-xyz-conformance.yml
+- https://docs.agenthealthmonitor.xyz/ (full page text + both PDFs searched for accessibility, subprocessor, DPA, residency,
+  GPC, SBOM, transparency, age, export terms)
+- https://agenthealthmonitor.xyz/ homepage, /app, /shield, /verify, /dashboard, /roadmap, /pay-by-card footers (no legal links
+  at all)
+probed:
+- url: https://agenthealthmonitor.xyz/accessibility
+  status: 404
+- url: https://agenthealthmonitor.xyz/legal/subprocessors
+  status: 404
+- url: https://agenthealthmonitor.xyz/legal/dpa
+  status: 404
+- url: https://agenthealthmonitor.xyz/legal
+  status: 404
+- url: https://agenthealthmonitor.xyz/transparency
+  status: 404
+- url: https://agenthealthmonitor.xyz/trust
+  status: 404
+- url: https://agenthealthmonitor.xyz/security
+  status: 404
+- url: https://agenthealthmonitor.xyz/privacy
+  status: 404
+- url: https://agenthealthmonitor.xyz/privacy-policy
+  status: 404
+- url: https://agenthealthmonitor.xyz/terms
+  status: 404
+- url: https://agenthealthmonitor.xyz/tos
+  status: 404
+- url: https://agenthealthmonitor.xyz/.well-known/security.txt
+  status: 404
+- url: https://agenthealthmonitor.xyz/robots.txt
+  status: 404
+signals: {}
+notes: 'Empty signals is the measurement. Digital Intensity Ltd publishes none of the horizontal-regime artefacts: no accessibility
+  statement or VPAT, no subprocessor list, no DPA, no privacy policy or data-subject-request route, no data-residency statement
+  (the service runs on Railway behind Cloudflare; the docs say only "Base mainnet — primary scanning and evaluation network"),
+  no SBOM (the source is open on GitHub with a requirements.txt, which is a dependency list and not an SBOM — not recorded),
+  no support-lifetime statement, no AI-transparency page even though AHM Verify is explicitly "built entirely on Claude" (that
+  sentence is a product description on the docs page, not a transparency disclosure, and is not recorded as ai_transparency),
+  no incident-notification SLA, no age, notice-and-action, transparency-report or exit-assistance pages. The absence of ANY
+  terms of service or privacy policy on a site that takes card and USDC payments is the single most notable finding here.'

@@ -1,0 +1,96 @@
+generated: '2026-09-19'
+method: searched
+source: 'https://github.com/moonshot-cyber/agent-health-monitor/blob/master/api.py (the provider''s public source: slowapi
+  Limiter keyed on client IP, @limiter.limit decorators per route, rate_limit_exceeded_handler, validate_fiat_request)'
+additional_sources:
+- https://docs.agenthealthmonitor.xyz/ (publishes NO rate limits)
+- live responses 2026-09-19 (no rate-limit headers on 200/401/402)
+corroboration: The docs site, PDFs and README publish no request-rate limits at all; the numbers below are read from the deployed
+  application's open-source code and were not observed live (this pipeline made well under 10 requests per minute to any route).
+  No RateLimit/X-RateLimit/Retry-After header appeared on any response, which matches slowapi's default (headers_enabled is
+  not set).
+confidence: medium
+documented_in_docs: false
+limit_count: 8
+headers: []
+status_on_exhaustion: 429
+exhaustion_body:
+  per_ip: '{"error": "Rate limit exceeded", "detail": "60 per 1 minute"}'
+  api_key_credits: '{"detail": "API key calls exhausted"}'
+  coupon: '{"detail": "Too many coupon validation attempts"} / {"detail": "Too many coupon access requests"}'
+scopes:
+- scope: per-ip
+  surface: GET /risk/{address}, GET /counterparties/{address}, GET /network-map/{address}, GET /health/{address}, POST /wash/{address},
+    GET /ahs/{address}, GET /ahs/route/policy, PUT /ahs/route/policy, POST /ahs/batch, GET /agent/protect/preview/{address},
+    GET /alerts/subscribe/{address}, POST /alerts/configure, GET /scan/quality
+  window: 1 minute
+  limit: 60
+  unit: requests
+  burst: null
+  status_on_exhaustion: 429
+  headers: []
+  source: api.py @limiter.limit("60/minute")
+- scope: per-ip
+  surface: GET /ahs/route/{address}, GET /report-card/{address}
+  window: 1 minute
+  limit: 20
+  unit: requests
+  status_on_exhaustion: 429
+  headers: []
+  source: api.py @limiter.limit("20/minute")
+- scope: per-ip
+  surface: GET /optimize/{address}, GET /retry/preview/{address}
+  window: 1 minute
+  limit: 10
+  unit: requests
+  status_on_exhaustion: 429
+  headers: []
+  source: api.py @limiter.limit("10/minute")
+- scope: per-ip
+  surface: POST /chat
+  window: unspecified (in-memory sliding window)
+  limit: 10
+  unit: requests
+  status_on_exhaustion: 429
+  source: api.py CHAT_RATE_LIMIT = 10
+- scope: per-ip
+  surface: GET /coupon/validate/{code}
+  window: unspecified (in-memory sliding window)
+  limit: 5
+  unit: attempts
+  status_on_exhaustion: 429
+  source: api.py COUPON_RATE_LIMIT = 5
+- scope: per-ip
+  surface: GET /coupon/{action}/{code}/{address}
+  window: unspecified (in-memory sliding window)
+  limit: 5
+  unit: requests
+  status_on_exhaustion: 429
+  source: api.py COUPON_ACCESS_RATE_LIMIT = 5
+- scope: per-key
+  surface: every paid operation with X-API-Key
+  window: lifetime of the credit pack
+  limit: 100 (Starter) / 500 (Pro) / unlimited (Unlimited $99/mo)
+  unit: calls (1 per call; 1 per wallet on /ahs/batch)
+  status_on_exhaustion: 429
+  source: https://docs.agenthealthmonitor.xyz/#pricing + api.py validate_fiat_request
+- scope: per-request
+  surface: POST /ahs/batch
+  window: per call
+  limit: 10 wallets per x402 call; 25 wallets per API-key call
+  unit: addresses
+  status_on_exhaustion: 422
+  source: https://docs.agenthealthmonitor.xyz/#endpoints
+unlimited:
+- surface: GET /api/info, /api/ecosystem-stats, /api/leaderboard, /api/agent/{address}, /up, /.well-known/*
+  note: No limiter decorator in source; Cloudflare caches them (max-age=14400).
+- surface: GET /retry/{address}, GET /agent/protect/{address}, GET /risk/premium/{address}, GET /alerts/status/{address},
+    DELETE /alerts/unsubscribe/{address}
+  note: No @limiter.limit decorator found on these routes in the source read on 2026-09-19; payment/credit consumption is
+    the only throttle.
+retry_guidance: On 429 with the {"error":"Rate limit exceeded"} body, wait for the rest of the current minute — no Retry-After
+  is sent. On {"detail":"API key calls exhausted"} do not retry; buy credits or switch to x402. Remember every retried paid
+  x402 call is a new payment.
+upstream_note: The source comments record upstream limits AHM itself is subject to (Nansen direct 5 req/s / 60 req/min; Corbits
+  proxy 20 req/s / 300 req/min) and keeps those calls sequential, which bounds the latency of the Nansen-enriched routes (/risk/premium,
+  /counterparties, /network-map).

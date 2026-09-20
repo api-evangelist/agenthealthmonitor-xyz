@@ -1,0 +1,113 @@
+generated: '2026-09-19'
+method: searched
+format: fastapi-detail-envelope
+rfc9457: false
+source: 'Derived from the 4xx responses declared in openapi/agenthealthmonitor-xyz-openapi.yml and openapi/agenthealthmonitor-xyz-verify-openapi.yml
+  (FastAPI: only 422 HTTPValidationError is declared) and enriched from live unauthenticated responses observed 2026-09-19
+  and the 429/401 handlers in the provider''s public source (github.com/moonshot-cyber/agent-health-monitor/blob/master/api.py).'
+envelope:
+  media_type: application/json
+  default_shape: '{ "detail": string }'
+  validation_shape: '{ "detail": [ { "loc": [string|int, ...], "msg": string, "type": string } ] }  (HTTPValidationError ->
+    ValidationError[])'
+  rate_limit_shape: '{ "error": "Rate limit exceeded", "detail": "<limit string, e.g. 60 per 1 minute>" }'
+  payment_shape: HTTP 402 with an EMPTY JSON body ({}) — the x402 v2 challenge is carried in the PAYMENT-REQUIRED response
+    header as base64 JSON {x402Version, error, resource, accepts[], extensions}
+  request_id: No X-Request-Id was observed on any response (the source declares it in CORS expose_headers but no middleware
+    sets it); Railway adds x-railway-request-id and Cloudflare adds cf-ray, which are the only correlation ids available.
+  note: 'Not RFC 9457: no type URI, title or instance and no application/problem+json. The agent-recoverable part of the contract
+    is the 402 PAYMENT-REQUIRED header — everything an x402 client needs to pay and retry is in it.'
+problems:
+- status: 402
+  title: Payment Required (x402)
+  operations:
+  - 'every paid operation: get_risk_score_risk__address__get, get_premium_risk_score_risk_premium__address__get, get_counterparties_counterparties__address__get,
+    get_network_map_network_map__address__get, get_health_report_health__address__get, get_wash_report_wash__address__post,
+    get_ahs_report_ahs__address__get, get_trust_route_ahs_route__address__get, get_routing_policy_ahs_route_policy_get, put_routing_policy_ahs_route_policy_put,
+    get_ahs_batch_ahs_batch_post, get_report_card_report_card__address__get, subscribe_alerts_alerts_subscribe__address__get,
+    get_optimization_report_optimize__address__get, get_retry_transactions_retry__address__get, get_protection_report_agent_protect__address__get;
+    AHM Verify submit_output_v1_outputs_post'
+  meaning: 'No X-PAYMENT header and no valid X-API-Key. The PAYMENT-REQUIRED header names the price (accepts[].amount in USDC
+    base units: 1000 = $0.001, 1000000 = $1.00, 500000 = $0.50), payTo, network eip155:8453 and maxTimeoutSeconds 300.'
+  observed: GET /risk/0x0000000000000000000000000000000000000001 -> 402; GET /ahs/route/policy -> 402; GET /health (no address)
+    -> 402; POST verify /v1/outputs -> 402
+  remediation: Sign the EIP-3009 authorization for one accepts[] entry and resend with X-PAYMENT (an x402 client library does
+    this automatically), or send X-API-Key with a purchased key.
+  retryable: true
+- status: 401
+  title: Unauthorized — API key
+  operations:
+  - api_key_status_api_key_status_get
+  - any paid operation called with an invalid key
+  - partner_usage_partners__partner_id__usage_get
+  meaning: X-API-Key header missing where required ("X-API-Key header required"), or present but invalid/expired ("Invalid
+    or expired API key"); "X-API-Key or x402 payment required" on batch/policy routes with neither.
+  observed: GET /api/key/status -> 401 {"detail":"X-API-Key header required"}
+  remediation: Buy a key at https://agenthealthmonitor.xyz/pay-by-card (Stripe) and send it as X-API-Key; keys are shown once
+    at /stripe/key/{session_id} after checkout.
+  retryable: false
+- status: 401
+  title: Unauthorized — internal
+  operations:
+  - trust_registry_trust_registry_get
+  - security_activity_security_activity_get
+  - internal_agent_profile_internal_agent_profile__address__get
+  - the *_scan_trigger / *_scan_status admin operations
+  - erc8183_status_erc8183_status_get
+  meaning: Route is protected by X-Internal-Key and is not available via x402 or a customer API key.
+  observed: GET /trust-registry -> 401 {"detail":"Unauthorized"}
+  remediation: None for the public — operator-only surface.
+  retryable: false
+- status: 404
+  title: Not Found
+  operations:
+  - any undeclared path; also the A2A endpoint /a2a the agent card declares
+  meaning: FastAPI default {"detail":"Not Found"}.
+  observed: GET /a2a, /mcp, /terms, /privacy, /llms.txt -> 404 {"detail":"Not Found"}
+  retryable: false
+- status: 405
+  title: Method Not Allowed
+  operations:
+  - submit_output_v1_outputs_post (GET)
+  observed: GET verify /v1/outputs -> 405 {"detail":"Method Not Allowed"}
+  retryable: false
+- status: 400
+  title: Bad Request — invalid input
+  operations:
+  - configure_alerts_alerts_configure_post
+  meaning: webhook_type must be generic, slack or discord; webhook_url must be a public http(s) URL (private, loopback, link-local,
+    .internal/.local and cloud-metadata hosts are refused — SSRF guard in source).
+  retryable: false
+- status: 422
+  title: Validation Error
+  operations:
+  - every operation with a path/body parameter (declared in both specs)
+  meaning: 'Pydantic validation failure: malformed wallet address (must be 0x-prefixed, 40 hex chars), missing required body
+    fields, or a routing policy that fails its invariants (all six grades A–F assigned exactly once; escrow_disabled consistency;
+    allowlist max 1000 valid addresses, no self-allowlisting, allowlisted addresses must be Grade C or above — put_routing_policy_ahs_route_policy_put).'
+  schema: HTTPValidationError
+  retryable: false
+- status: 429
+  title: Too Many Requests — per-IP rate limit
+  operations:
+  - 'every rate-limited route (slowapi): 60/minute on most, 20/minute on get_trust_route_ahs_route__address__get and get_report_card_report_card__address__get,
+    10/minute on get_optimization_report_optimize__address__get and retry_preview_retry_preview__address__get; 5 per window
+    on coupon validation/access; 10 per window on chat_chat_post'
+  meaning: '{"error":"Rate limit exceeded","detail":"60 per 1 minute"}. No Retry-After or RateLimit headers are emitted.'
+  source: api.py rate_limit_exceeded_handler (public source); limits are not documented on the docs site
+  remediation: Back off for the remainder of the minute; the numbers are per client IP.
+  retryable: true
+- status: 429
+  title: Too Many Requests — API key credits exhausted
+  operations:
+  - any paid operation with an X-API-Key whose calls_remaining is 0
+  meaning: '{"detail":"API key calls exhausted"} — Starter (100 calls) or Pro (500 calls) credit pack is spent.'
+  remediation: Buy another pack or the Unlimited subscription; or pay per call with x402 instead.
+  retryable: false
+- status: 500
+  title: Internal Server Error
+  operations:
+  - undeclared
+  meaning: Not declared in either spec; upstream data providers (Blockscout, Nansen) are called synchronously so a failure
+    there can surface as a 5xx. Not observed by this pipeline.
+  retryable: true

@@ -1,0 +1,343 @@
+openapi: 3.1.0
+info:
+  title: AHM Verify
+  description: Post-transaction output quality scoring via a six-role Claude adjudication panel (D4)
+  version: 0.1.0
+servers:
+- url: https://verify.agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://verify.agenthealthmonitor.xyz/openapi.json
+    declares no servers[]; the host is the one that serves the spec and its Swagger UI (/docs) and is named as "Live at: verify.agenthealthmonitor.xyz"
+    on docs.agenthealthmonitor.xyz. Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+paths:
+  /v1/specs:
+    post:
+      summary: Create Spec
+      description: Register a job specification. Returns spec_id and spec_hash.
+      operationId: create_spec_v1_specs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/outputs:
+    post:
+      summary: Submit Output
+      description: Submit an agent's output for evaluation. Triggers async panel pipeline.
+      operationId: submit_output_v1_outputs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutputRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/verdicts/{verdict_id}:
+    get:
+      summary: Get Verdict
+      description: Poll for verdict result. Returns status + full result when completed.
+      operationId: get_verdict_v1_verdicts__verdict_id__get
+      parameters:
+      - name: verdict_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Verdict Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerdictResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    OutputRequest:
+      properties:
+        spec_id:
+          type: string
+          title: Spec Id
+          description: UUID of the pre-registered spec
+        output_text:
+          type: string
+          minLength: 1
+          title: Output Text
+          description: The agent's delivered output text
+        submitted_by:
+          type: string
+          title: Submitted By
+          description: 'Who submitted: client, agent, or protocol'
+          default: client
+        submitter_addr:
+          type: string
+          title: Submitter Addr
+          description: Wallet address of the submitter
+        provider_addr:
+          type: string
+          title: Provider Addr
+          description: Wallet address of the agent/provider
+        mode:
+          type: string
+          title: Mode
+          description: Evaluation mode. Only 'standard' is implemented — every verdict runs the standard pipeline at $0.50.
+          default: standard
+      type: object
+      required:
+      - spec_id
+      - output_text
+      - submitter_addr
+      - provider_addr
+      title: OutputRequest
+    OutputResponse:
+      properties:
+        verdict_id:
+          type: string
+          title: Verdict Id
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - verdict_id
+      - status
+      title: OutputResponse
+    SpecRequest:
+      properties:
+        client_addr:
+          type: string
+          title: Client Addr
+          description: Wallet address of the client registering the spec
+        provider_addr:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Addr
+          description: Intended provider address, if known
+        spec_text:
+          type: string
+          minLength: 1
+          title: Spec Text
+          description: Task specification / job description
+        acceptance_criteria:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Acceptance Criteria
+          description: Pre-registered acceptance criteria
+        domain:
+          type: string
+          title: Domain
+          description: Evaluation domain key
+          default: default
+        erc8183_job_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Erc8183 Job Id
+          description: Optional on-chain job ID (hex)
+      type: object
+      required:
+      - client_addr
+      - spec_text
+      title: SpecRequest
+    SpecResponse:
+      properties:
+        spec_id:
+          type: string
+          title: Spec Id
+        spec_hash:
+          type: string
+          title: Spec Hash
+      type: object
+      required:
+      - spec_id
+      - spec_hash
+      title: SpecResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    VerdictResponse:
+      properties:
+        verdict_id:
+          type: string
+          title: Verdict Id
+        status:
+          type: string
+          title: Status
+        final_verdict:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Final Verdict
+        final_score:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Final Score
+        confidence:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Confidence
+        mdi:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mdi
+        on_chain_action:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: On Chain Action
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        met_criteria:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Met Criteria
+        unmet_criteria:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Unmet Criteria
+        key_objections:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Key Objections
+        reasoning:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reasoning
+        strongest_dissent:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Strongest Dissent
+        generator_majority:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Generator Majority
+        critic_override_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Critic Override Applied
+        zero_history_adjustment_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Zero History Adjustment Applied
+        rejection_asymmetry_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Rejection Asymmetry Applied
+        latency_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Latency Ms
+        evaluated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Evaluated At
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+      type: object
+      required:
+      - verdict_id
+      - status
+      title: VerdictResponse

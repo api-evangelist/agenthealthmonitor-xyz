@@ -1,0 +1,281 @@
+generated: '2026-09-19'
+method: probed
+source: live GET probes on every host the record knows (apex, www, docs, blog, verify, intelligence), 2026-09-19, browser
+  User-Agent
+summary: 'The apex host agenthealthmonitor.xyz is a FastAPI application and answers unknown paths with a real JSON 404, so
+  its 200s are served documents: a legacy-path A2A agent card at /.well-known/agent.json (graded in a2a/), an x402 v2 payable-resource
+  discovery document at /.well-known/x402 (15 resources, facilitator https://facilitator.payai.network, all priced in USDC
+  on eip155:8453), an ERC-8004 registration file at /.well-known/agent-registration.json (type eips.ethereum.org/EIPS/eip-8004#registration-v1)
+  and a 402index.io ownership-verification token at /.well-known/402index-verify.txt. Every RFC-shaped document the rating
+  reads is ABSENT on every host: no security.txt (RFC 9116), no OpenID Connect discovery, no RFC 8414 authorization-server
+  metadata, no RFC 9728 protected-resource metadata, no RFC 9727 api-catalog, no ai-plugin.json, no llms.txt. www. is a pure
+  301 to the apex. docs. is an SPA catch-all (its negative control returned 200 with the same 40,648-byte HTML shell) and
+  is recorded with hit_count 0. blog., verify. and intelligence. return real 404s for every well-known path; verify. serves
+  its own OpenAPI at /openapi.json (saved to openapi/).'
+pointer_basis: WellKnown pointer emitted on the strength of three served, parsed, non-standard-but-real documents on the apex
+  (/.well-known/x402, /.well-known/agent-registration.json, /.well-known/agent.json). No SecurityTxt pointer (RFC 9116 is
+  unimplemented on every host), no APICatalog pointer (RFC 9727 absent), and no OAuth/OIDC-derived pointers.
+path_echo_control:
+  apex: passed (404 on /.well-known/agenthealthmonitor-xyz-negative-control-7f3ab91c.json)
+  docs: failed (200 text/html 40,648 bytes — SPA catch-all; every hit on that host discarded)
+  blog: passed (404)
+  verify: passed (404)
+  intelligence: passed (404)
+hosts:
+- host: https://agenthealthmonitor.xyz
+  hit_count: 3
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    file: ../a2a/agenthealthmonitor-xyz-agent-card.json
+    note: A2A agent card at the legacy path; graded flavored in a2a/agenthealthmonitor-xyz-a2a.yml.
+  - path: /.well-known/x402
+    status: 200
+    content_type: application/json
+    file: agenthealthmonitor-xyz-x402.json
+    note: 'x402 discovery document: {x402: true, version: 1, service, facilitator https://facilitator.payai.network, resources[15],
+      endpoints[15]} — each endpoint carries method, payment[] {scheme exact, network eip155:8453, pay_to 0xaD64…f000, price}
+      and a Bazaar info block with example output and JSON schema. Prices $0.001 to $25.00. Live 402 challenges on the paid
+      routes carry a base64 PAYMENT-REQUIRED header whose accepts[] matches this document (asset 0x8335…2913 = USDC on Base,
+      maxTimeoutSeconds 300).'
+  - path: /.well-known/x402.json
+    status: 404
+  - path: /.well-known/agent-registration.json
+    status: 200
+    content_type: application/json
+    file: agenthealthmonitor-xyz-agent-registration.json
+    note: 'ERC-8004 registration-v1 document: name Agent Health Monitor, image, services[] {web, x402} both at https://agenthealthmonitor.xyz.
+      Docs name the on-chain identity as ERC-8004 #32328 (8004scan.io).'
+  - path: /.well-known/402index-verify.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: agenthealthmonitor-xyz-402index-verify.txt
+    note: 64-hex ownership-verification token for the 402index.io directory. Not a discovery document; recorded because it
+      is a real served well-known file.
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 404
+  - path: /.well-known/agents.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /robots.txt
+    status: 404
+  - path: /sitemap.xml
+    status: 404
+  - path: /openapi.json
+    status: 200
+    content_type: application/json
+    note: OpenAPI 3.1.0, 74 paths — saved verbatim to openapi/_original/agenthealthmonitor-xyz-openapi.json.
+  - path: /docs
+    status: 200
+    content_type: text/html; charset=utf-8
+    note: Swagger UI shell (1,023 bytes) for /openapi.json — the API reference, not a document.
+  - path: /redoc
+    status: 200
+    content_type: text/html; charset=utf-8
+    note: ReDoc shell for /openapi.json.
+  - path: /api/info
+    status: 200
+    content_type: application/json
+    note: 'Provider service-info endpoint (declared in the OpenAPI): service, version 1.8.0, network Base L2, endpoint price
+      list, payment "x402 protocol (USDC on Base)".'
+  - path: /up
+    status: 200
+    content_type: application/json
+    note: '{"status":"ok"} liveness endpoint (declared in the OpenAPI as up_up_get).'
+  - path: /mcp
+    status: 404
+  - path: /a2a
+    status: 404
+    note: The A2A endpoint the agent card declares; 404 on GET and JSON-RPC POST.
+- host: https://www.agenthealthmonitor.xyz
+  hit_count: 0
+  documents: []
+  note: Every path 301s to the same path on https://agenthealthmonitor.xyz — a redirect-only host, nothing served here.
+- host: https://docs.agenthealthmonitor.xyz
+  hit_count: 0
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /llms.txt
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  - path: /openapi.json
+    status: 200
+    content_type: text/html; charset=utf-8
+    soft_404: true
+    note: 'SPA catch-all: identical 40,648-byte HTML shell of the docs site for every path, including the negative control.
+      NOT a document; not counted.'
+  soft_404_control:
+    path: /.well-known/agenthealthmonitor-xyz-negative-control-7f3ab91c.json
+    status: 200
+    bytes: 40648
+    content_type: text/html; charset=utf-8
+  note: Cloudflare-fronted static docs site; real content is the single page https://docs.agenthealthmonitor.xyz/ plus two
+    PDFs (AHM-Getting-Started.pdf, AHM_Overview_Branded.pdf).
+- host: https://blog.agenthealthmonitor.xyz
+  hit_count: 0
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /openapi.json
+    status: 404
+  - path: /feed.xml
+    status: 404
+  - path: /rss.xml
+    status: 404
+  - path: /feed
+    status: 404
+  - path: /index.xml
+    status: 404
+  note: Static blog (one post, 28 May 2026); real 404 HTML page (1,641 bytes) for every probed path; no RSS/Atom feed at any
+    conventional path.
+- host: https://verify.agenthealthmonitor.xyz
+  hit_count: 0
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /.well-known/x402
+    status: 404
+  - path: /openapi.json
+    status: 200
+    content_type: application/json
+    note: AHM Verify OpenAPI 3.1.0 (4 paths) — saved verbatim to openapi/_original/agenthealthmonitor-xyz-verify-openapi.json.
+  - path: /health
+    status: 200
+    content_type: application/json
+    note: '{"status":"ok","service":"ahm-verify","version":"0.1.0"}'
+  - path: /docs
+    status: 200
+    content_type: text/html
+    note: Swagger UI for the Verify spec.
+  note: Second FastAPI app; GET / is 404 (API-only host).
+- host: https://intelligence.agenthealthmonitor.xyz
+  hit_count: 0
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /openapi.json
+    status: 404
+  note: Static analytics site (Ecosystem Overview / Registry Deep Dive / Taxonomy / Agents pages); real 404 for every probed
+    path.

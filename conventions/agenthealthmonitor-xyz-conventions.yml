@@ -1,0 +1,164 @@
+generated: '2026-09-19'
+method: searched
+source: https://docs.agenthealthmonitor.xyz/ (Integration, API Quick Start, Endpoints), the OpenAPI at openapi/agenthealthmonitor-xyz-openapi.yml
+  (info.description payment/coupon text, operation descriptions), the README of github.com/moonshot-cyber/agent-health-monitor,
+  and live unauthenticated responses on 2026-09-19 (402 challenges, 401s, response headers). Rate-limit numbers come from
+  the provider's public api.py, not from any docs page.
+description: 'How the Agent Health Monitor REST API behaves across every operation: pay-per-call x402 (HTTP 402 + PAYMENT-REQUIRED)
+  or a fiat X-API-Key, no idempotency mechanism, no pagination, a FastAPI {"detail"} error envelope, per-IP rate limits with
+  no headers, unversioned paths, and one reversible surface (alert subscriptions).'
+base_url: https://agenthealthmonitor.xyz
+api_style: REST over HTTPS, JSON responses; mostly GET with the wallet address in the path; FastAPI/Pydantic
+authentication:
+  scheme: x402 v2 payment (X-PAYMENT request header after a 402 challenge) OR X-API-Key header (fiat key bought via Stripe);
+    X-Internal-Key on operator routes; partner coupon codes in the path (/coupon/{action}/{code}/{address})
+  key_types:
+  - ahm_live_ (README and SDK examples) — the docs quick-start shows ahm_sk_; only ahm_live_ appears in the source
+  public_operations:
+  - root__get and the HTML pages
+  - api_info_api_info_get
+  - ecosystem_stats_api_ecosystem_stats_get
+  - leaderboard_api_leaderboard_get
+  - get_agent_public_api_agent__address__get
+  - endpoint_info_api_endpoint_info__slug__get
+  - retry_preview_retry_preview__address__get
+  - protection_preview_agent_protect_preview__address__get
+  - alert_status_alerts_status__address__get
+  - configure_alerts_alerts_configure_post
+  - unsubscribe_alerts_alerts_unsubscribe__address__delete
+  - validate_coupon_coupon_validate__code__get
+  - up_up_get
+  - a2a_agent_card__well_known_agent_json_get
+  - x402_discovery__well_known_x402_get
+  - agent_registration__well_known_agent_registration_json_get
+  docs: https://docs.agenthealthmonitor.xyz/#gs-api
+  detail: authentication/agenthealthmonitor-xyz-authentication.yml
+payment:
+  protocol: x402 v2
+  network: eip155:8453 (Base mainnet)
+  asset: USDC 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+  scheme: exact
+  pay_to: 0xaD64EFCe9CfeE4d1D1701d9a0009CCa72B9ff000 (main API); 0x23A2e9Cd7F0a602A3FcFFaf8074113A9205726E5 (AHM Verify)
+  facilitator: https://facilitator.payai.network
+  max_timeout_seconds: 300
+  challenge: HTTP 402, body {}, PAYMENT-REQUIRED header = base64(JSON {x402Version 2, error, resource{url,description,mimeType},
+    accepts[], extensions.bazaar})
+  discovery: https://agenthealthmonitor.xyz/.well-known/x402 (15 resources with prices)
+  prices: $0.001 (/risk) to $25.00 (/agent/protect); see plans/agenthealthmonitor-xyz-plans-pricing.yml
+  fiat_alternative: 'X-API-Key credit packs: 1 call = 1 credit regardless of endpoint; /ahs/batch = 1 credit per wallet (up
+    to 25 via key, 10 via x402)'
+idempotency:
+  supported: false
+  coverage: none
+  scope: []
+  mechanism: null
+  note: No Idempotency-Key header or parameter in either contract or the docs. Reads are naturally idempotent but each x402
+    call is a separate payment, so a retried paid GET is charged again. PUT /ahs/route/policy is a full replace and therefore
+    safe to repeat; POST /alerts/configure overwrites the subscription's webhook and thresholds; GET /alerts/subscribe/{address}
+    is NOT idempotent — "If already subscribed, extends by 30 days" and charges $2.00 each time.
+reversibility:
+  status: documented
+  write_surface:
+  - operation: subscribe_alerts_alerts_subscribe__address__get
+    effect: Charges $2.00 USDC (or 1 credit) and activates 30 days of monitoring for the wallet; extends by 30 days if already
+      active.
+    reversal: unsubscribe_alerts_alerts_unsubscribe__address__delete (DELETE /alerts/unsubscribe/{address}, free)
+    window: null
+    note: A reversal operation exists and is documented (README §5 "Unsubscribe (free)"); no refund of the paid period is
+      stated, and no time window inside which unsubscribing refunds anything is published — so this grades documented, not
+      verified. The subscription otherwise lapses after 30 days.
+    docs: https://github.com/moonshot-cyber/agent-health-monitor#5-alert-monitoring-200month--stay-on-top-of-it
+  - operation: configure_alerts_alerts_configure_post
+    effect: Sets or replaces webhook_url, webhook_type and thresholds on an active subscription.
+    reversal: Re-POST with new values (replace) or unsubscribe
+    window: null
+  - operation: put_routing_policy_ahs_route_policy_put
+    effect: Creates or replaces the caller's trust-routing policy (grade sets, allowlist, escrow toggle, confidence overrides);
+      $0.01 or 1 credit.
+    reversal: Re-PUT (full replace). No DELETE / reset-to-default operation is published.
+    window: null
+  - operation: x402 payments on every paid operation
+    effect: Settles USDC on Base per call.
+    reversal: null
+    window: null
+    note: No refund operation or refund policy is published; on-chain settlement is final.
+  - operation: shield_subscribe_shield_subscribe_post / Stripe payment links
+    effect: Starts a Stripe checkout for an API-key pack or the $99/month Unlimited subscription.
+    reversal: null
+    window: null
+    note: No cancel operation in the API and no cancellation or refund terms published (there is no terms-of-service page).
+      Cancellation, if any, is via Stripe.
+  - operation: get_wash_report_wash__address__post, get_ahs_batch_ahs_batch_post, get_retry_transactions_retry__address__get,
+      get_protection_report_agent_protect__address__get
+    effect: 'Analysis-only: produce reports (retry returns READY-TO-SIGN transactions but signs and broadcasts nothing). No
+      downstream state to reverse beyond the payment.'
+    reversal: n/a
+    window: null
+  note: 'Graded documented (0.4): one reversal operation exists in the contract (alerts unsubscribe) with no stated window.
+    NOT na — a write and payment surface exists.'
+  docs: https://github.com/moonshot-cyber/agent-health-monitor#readme
+dry_run_mode:
+  supported: partial
+  operations:
+  - operation: retry_preview_retry_preview__address__get
+    previews: get_retry_transactions_retry__address__get
+    note: 'Free: "preview retryable failure count and estimated savings" before paying $10.00.'
+  - operation: protection_preview_agent_protect_preview__address__get
+    previews: get_protection_report_agent_protect__address__get
+    note: 'Free: "See the risk level and which services would run before paying" $25.00.'
+  note: Two free preview operations act as rehearsals for the two most expensive calls. No dry_run/simulate/validate_only
+    parameter exists on any mutating operation, and PUT /ahs/route/policy has no validate-only mode (its invariants surface
+    as 422 on the real call).
+pagination:
+  style: none
+  note: No list endpoints with paging; /api/leaderboard and /api/ecosystem-stats return fixed aggregates; /ahs/batch is capped
+    (10 wallets per x402 call, 25 per API-key call).
+field_expansion:
+  supported: false
+  note: Depth is chosen by endpoint (risk -> risk/premium -> health -> ahs -> report-card) and by an optional agent URL that
+    activates the D3 infrastructure dimension and reweights AHS to 25/45/30.
+metadata:
+  supported: false
+request_tracing:
+  request_id_header: null
+  note: No X-Request-Id was observed on any response (the source lists it in CORS expose_headers but nothing sets it). Railway's
+    x-railway-request-id and Cloudflare's cf-ray are present on every response and are the only correlation ids.
+versioning:
+  scheme: none on the main API (unversioned paths; spec version 1.8.0); /v1/ prefix on AHM Verify (0.1.0)
+  mechanism: null
+  detail: lifecycle/agenthealthmonitor-xyz-lifecycle.yml
+error_envelope:
+  media_type: application/json
+  shape: '{"detail": string} or {"detail": ValidationError[]} (422); {"error": "Rate limit exceeded", "detail": "<n> per 1
+    minute"} (429); 402 has an empty {} body with the challenge in PAYMENT-REQUIRED'
+  rfc9457: false
+  detail: errors/agenthealthmonitor-xyz-problem-types.yml
+rate_limiting:
+  documented: false
+  headers: []
+  status_on_exhaustion: 429
+  observed: No RateLimit-*/X-RateLimit-*/Retry-After headers on any 200, 401 or 402 response.
+  limits: 'Per client IP via slowapi in the public source: 60/minute on most paid routes, 20/minute on /ahs/route/{address}
+    and /report-card/{address}, 10/minute on /optimize and /retry/preview; API-key credit exhaustion also returns 429.'
+  detail: rate-limits/agenthealthmonitor-xyz-rate-limits.yml
+webhooks:
+  supported: true
+  detail: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  summary: Outbound alert webhooks (slack | discord | generic JSON) every 6 hours for subscribed wallets; no signing, no retries
+    documented.
+caching:
+  observed: Cloudflare caches GET responses (cf-cache-status HIT, cache-control max-age=14400) on the public routes including
+    /openapi.json, /api/info and the agent card; /up and paid routes are not cached.
+cors:
+  enabled: true
+  note: CORSMiddleware in source; not verified live.
+input_conventions:
+  address: Ethereum wallet address, 0x-prefixed, 40 hex chars (path parameter on every scoring route; examples in the spec
+    use 0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae)
+  agent_url: Optional agent service URL (D3 overlay) — see docs "How the weights combine"
+output_conventions:
+  ahs: agent_health_score 0-100, grade A-F (A 90-100, B 75-89, C 60-74, D 40-59, E 20-39, F 0-19), confidence, dimensions[]
+    {dimension, score, weight, contributing_factors}, patterns_detected[], recommendations[], model_version AHS-v1; INSUFFICIENT
+    confidence instead of a low grade when history is thin
+  routing: instant_settle (A/B) | escrow (C) | reject (D/E/F) under the default policy
+  report_card: 1200x675 PNG plus a share URL

@@ -1,0 +1,181 @@
+generated: '2026-09-19'
+method: searched
+source: https://docs.agenthealthmonitor.xyz/#pricing
+checked: '2026-09-19'
+additional_sources:
+- https://agenthealthmonitor.xyz/ (API ACCESS section + Stripe payment links)
+- https://agenthealthmonitor.xyz/pay-by-card
+- https://agenthealthmonitor.xyz/api/info (per-endpoint x402 prices, machine-readable)
+- https://agenthealthmonitor.xyz/.well-known/x402 (per-resource prices, machine-readable)
+- https://agenthealthmonitor.xyz/shield (AHM Shield SDK tiers)
+- https://agenthealthmonitor.xyz/verify (AHM Verify per-verdict prices)
+- https://docs.agenthealthmonitor.xyz/#design-partner
+summary: 'Agent Health Monitor publishes every price. Humans buy X-API-Key credit packs via Stripe payment links — Starter
+  $9 one-time for 100 calls, Pro $39 one-time for 500 calls, Unlimited $99/month — all tiers cover all 14 endpoints (1 credit
+  per call; /ahs/batch 1 credit per wallet). Agents pay per call in USDC on Base over x402 with no account: 15 payable resources
+  from $0.001 (/risk) to $25.00 (/agent/protect), published both in prose and machine-readably at /api/info and /.well-known/x402.
+  AHM Shield (the Python SDK / white-label layer) advertises Free $0 (100 route checks/month, 1 agent), Starter $29/month
+  (10K checks, 5 agents), Pro $99/month (100K checks, 50 agents) and Enterprise $299/month (unlimited, "SLA + dedicated support",
+  contact us). AHM Verify is $0.50 per verdict (standard); the /verify page also lists a $1.50 "deep" mode and free spec registration,
+  but the Verify OpenAPI says only standard is implemented. A design-partner programme offers three months of free enterprise
+  access. No free tier exists on the main API beyond the two preview endpoints and the info routes.'
+plan_count: 10
+prices_published: true
+currency: USD (fiat via Stripe) / USDC on Base (x402)
+public_signup_pricing: true
+plans:
+- name: AHM Starter
+  family: API key (Stripe)
+  price: 9
+  currency: USD
+  billing_period: one-time
+  cta: https://buy.stripe.com/6oU00i0Jubqne01ayO5sA07
+  included_quota:
+    api_calls: 100
+  limits:
+    endpoints: all 14
+    auth: X-API-Key
+    batch: /ahs/batch = 1 credit per wallet, up to 25 wallets
+  overage: buy another pack; 429 "API key calls exhausted" when spent
+- name: AHM Pro
+  family: API key (Stripe)
+  price: 39
+  currency: USD
+  billing_period: one-time
+  cta: https://buy.stripe.com/cNibJ04ZKcuraNP0Ye5sA08
+  included_quota:
+    api_calls: 500
+  limits:
+    endpoints: all 14
+    auth: X-API-Key
+  overage: buy another pack
+  badge: Popular
+- name: AHM Unlimited
+  family: API key (Stripe)
+  price: 99
+  currency: USD
+  billing_period: month
+  cta: https://buy.stripe.com/fZu9AS2RC8ebbRTayO5sA09
+  included_quota:
+    api_calls: unlimited
+  limits:
+    endpoints: all 14
+    auth: X-API-Key
+    rate_limit: per-IP limits still apply (rate-limits/)
+  overage: null
+  cancellation: not published (no terms page); Stripe subscription
+- name: Pay-per-call (x402)
+  family: x402
+  price: 0.001-25.00
+  currency: USDC
+  billing_period: per call
+  audience: autonomous agents with a Base wallet; also usable by humans through the /app developer console
+  cta: call any paid endpoint without a key; answer the 402 with X-PAYMENT
+  network: eip155:8453 via https://facilitator.payai.network
+  included_quota:
+    per_call_prices:
+      GET /risk/{address}: $0.001
+      GET /ahs/route/{address}: $0.01
+      PUT /ahs/route/policy: $0.01
+      GET /risk/premium/{address}: $0.05
+      GET /counterparties/{address}: $0.10
+      GET /network-map/{address}: $0.10
+      GET /health/{address}: $0.50
+      POST /wash/{address}: $0.50
+      GET /ahs/{address}: $1.00
+      GET /report-card/{address}: $2.00
+      GET /alerts/subscribe/{address}: $2.00 per 30 days
+      GET /optimize/{address}: $5.00
+      POST /ahs/batch: $10.00 (up to 10 wallets)
+      GET /retry/{address}: $10.00
+      GET /agent/protect/{address}: $25.00
+  free:
+  - GET /retry/preview/{address}
+  - GET /agent/protect/preview/{address}
+  - GET /api/info
+  - GET /api/ecosystem-stats
+  - GET /api/leaderboard
+  - GET /api/agent/{address}
+  - POST /alerts/configure
+  - GET /alerts/status/{address}
+  - DELETE /alerts/unsubscribe/{address}
+  note: Prices are identical in the docs table, /api/info and /.well-known/x402 except that /api/info describes /ahs/route
+    as a $0.01 route and the homepage lists /risk at $0.01 while the docs, /api/info, the x402 document and the live 402 (amount
+    1000 = $0.001) all say $0.001.
+- name: Shield Free
+  family: AHM Shield SDK
+  price: 0
+  currency: USD
+  billing_period: month
+  included_quota:
+    route_checks_per_month: 100
+    agents: 1
+  limits:
+    support: community
+  source: https://agenthealthmonitor.xyz/shield
+- name: Shield Starter
+  family: AHM Shield SDK
+  price: 29
+  currency: USD
+  billing_period: month
+  included_quota:
+    route_checks_per_month: 10000
+    agents: up to 5
+  limits:
+    support: email
+  source: https://agenthealthmonitor.xyz/shield
+- name: Shield Pro
+  family: AHM Shield SDK
+  price: 99
+  currency: USD
+  billing_period: month
+  included_quota:
+    route_checks_per_month: 100000
+    agents: up to 50
+  limits:
+    support: priority
+  badge: Popular
+  source: https://agenthealthmonitor.xyz/shield
+- name: Shield Enterprise
+  family: AHM Shield SDK
+  price: 299
+  currency: USD
+  billing_period: month
+  included_quota:
+    route_checks_per_month: unlimited
+    agents: unlimited
+  limits:
+    support: SLA + dedicated support (no SLA document published)
+  cta: contact us
+  source: https://agenthealthmonitor.xyz/shield
+  note: The Shield page also advertises a reseller programme.
+- name: AHM Verify — Standard
+  family: AHM Verify
+  price: 0.5
+  currency: USDC
+  billing_period: per verdict
+  cta: POST https://verify.agenthealthmonitor.xyz/v1/outputs (x402)
+  included_quota:
+    panel: four Claude Sonnet generators, Claude Opus critic + synthesiser
+  free:
+  - POST /v1/specs (spec registration)
+  - GET /v1/verdicts/{verdict_id}
+  source: https://agenthealthmonitor.xyz/verify
+  note: Live 402 on POST /v1/outputs asked for amount 500000 (= $0.50 USDC).
+- name: AHM Verify — Deep
+  family: AHM Verify
+  price: 1.5
+  currency: USDC
+  billing_period: per verdict
+  source: https://agenthealthmonitor.xyz/verify
+  status: advertised on the /verify page; the Verify OpenAPI (OutputRequest.mode) states "Only 'standard' is implemented —
+    every verdict runs the standard pipeline at $0.50"
+programs:
+- name: Design Partner Programme
+  terms: three months of free enterprise access — unlimited API calls, priority support, and direct input into the product
+    roadmap
+  audience: protocols, marketplaces and enterprises building agent-to-agent workflows
+  source: https://docs.agenthealthmonitor.xyz/#design-partner
+- name: Partner coupons
+  terms: coupon codes grant access to any paid endpoint without x402 payment via /coupon/{action}/{code}/{address}
+  source: OpenAPI info.description

@@ -1,0 +1,82 @@
+generated: '2026-09-19'
+method: searched
+source: pypi.org/pypi/ahm-shield/json and registry.npmjs.org (unauthenticated, read 2026-09-19); https://agenthealthmonitor.xyz/shield
+  (links the PyPI project and GitHub repo); https://docs.agenthealthmonitor.xyz/#gs-shield (pip install ahm-shield); api.github.com/users/moonshot-cyber/repos
+summary:
+  first_party_sdk_count: 1
+  first_party_package_count: 2
+  third_party_package_count: 0
+  note: 'One first-party SDK: ahm-shield on PyPI (0.1.0, published 2026-04-06, MIT, author "Moonshot Cyber"). official: true
+    is well founded — the provider''s docs give the exact install command and the /shield page links both the PyPI project
+    and the GitHub repo, and the PyPI project_urls point at agenthealthmonitor.xyz/docs. The publisher is the GitHub user
+    account moonshot-cyber ("Pablo" — the founder named on the docs page), not an org named Digital Intensity. CURRENCY SIGNAL:
+    the SDK has had a single release, on 2026-04-06, while the API it wraps is at 1.8.0 with the source pushed 2026-09-02
+    and the spec re-served 2026-09-19 — five months without an SDK release against a moving API. The SDK still calls only
+    /ahs/route, which is unchanged. No npm, Maven, NuGet, Go, RubyGems, Packagist or crates.io package exists; the npm package
+    agent-health-monitor is an unrelated third-party CLI (coding-agent session degradation) and is NOT this provider''s.'
+github_organization:
+  found: true
+  url: https://github.com/moonshot-cyber
+  note: A personal user account (name Pablo), not an organisation; it hosts the API source, the SDK and an ERC-8183 envelope
+    case library. The company name Digital Intensity Ltd appears only in the A2A agent card provider.organization.
+packages:
+- language: python
+  kind: sdk
+  registry: pypi
+  name: ahm-shield
+  url: https://pypi.org/project/ahm-shield/
+  install: pip install ahm-shield
+  extras: pip install ahm-shield[fastapi]
+  import: from ahm_shield import AHMShield
+  repo: https://github.com/moonshot-cyber/ahm-shield
+  official: true
+  license: MIT
+  version: 0.1.0
+  published: '2026-04-06'
+  release_count: 1
+  requires:
+  - httpx>=0.24
+  python: 3 (classifier); Development Status 4 - Beta
+  note: 'Thin client over GET /ahs/route/{address}: AHMShield(api_key).route(address) -> action instant_settle|escrow|reject,
+    grade, score, confidence, stale; @shield.guard decorator (on_reject raise|return, on_escrow flag|raise|allow; async-aware);
+    AHMShieldMiddleware for FastAPI (rejected addresses get 403). The docs quick-start imports `Shield` with an ahm_sk_ key
+    while the README/PyPI use `AHMShield` with ahm_live_ — the PyPI README is the authoritative surface.'
+- language: python
+  kind: source
+  registry: github
+  name: agent-health-monitor
+  url: https://github.com/moonshot-cyber/agent-health-monitor
+  install: git clone https://github.com/moonshot-cyber/agent-health-monitor.git && pip install -r requirements.txt && uvicorn
+    api:app --host 0.0.0.0 --port 4021
+  official: true
+  license: MIT (stated in README; no LICENSE file in the tree)
+  version: null
+  published: '2026-09-02'
+  note: 'The complete API service (FastAPI + x402 SDK v2 + Nansen/Blockscout integrations, ~278 KB api.py), self-hostable
+    with your own PAYMENT_ADDRESS. version: null because GitHub is not a versioned registry — published: is the last push
+    date; the deployed service reports 1.8.0 at /api/info. Not an SDK; recorded as the provider''s only other first-party
+    code distribution.'
+not_packages:
+- name: agent-health-monitor (npm 0.1.0)
+  reason: Unrelated third-party CLI ("detect AI coding agent session degradation", bin am) — name collision, not affiliated.
+- name: moonshot-cyber/virtuals-acp
+  reason: A checkout of Virtual-Protocol/openclaw-acp (the Virtuals ACP CLI) used to run AHM as an ACP seller; not AHM code.
+- name: moonshot-cyber/skills
+  reason: A Moltbot skill library (bankr, base, clanker, erc-8004, neynar, zapper…) with no AHM skill in it.
+registries_checked:
+  pypi:
+  - ahm-shield (hit)
+  - agenthealthmonitor
+  - agent-health-monitor
+  - ahm
+  - ahm-sdk
+  - ahm-client (all 404)
+  npm:
+  - ahm-shield
+  - '@ahm/shield'
+  - agenthealthmonitor
+  - '@agenthealthmonitor/sdk (all 404)'
+  - agent-health-monitor (unrelated)
+  github_search: agenthealthmonitor -> 0 repos; ahm-shield -> moonshot-cyber/ahm-shield
+  others: Maven Central, NuGet, pkg.go.dev, RubyGems, Packagist, crates.io — nothing referenced by the provider; not probed
+    by name.

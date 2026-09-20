@@ -1,0 +1,36 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for AHM Verify
+  version: 1.0.0
+  description: Enhancements on top of https://verify.agenthealthmonitor.xyz/openapi.json (info.version 0.1.0), which declares
+    no servers[] and no securitySchemes although POST /v1/outputs answers HTTP 402 with an x402 PAYMENT-REQUIRED header ($0.50
+    USDC per verdict, payTo 0x23A2e9Cd7F0a602A3FcFFaf8074113A9205726E5).
+extends: openapi/agenthealthmonitor-xyz-verify-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: agenthealthmonitor-xyz
+    x-apievangelist-source: https://verify.agenthealthmonitor.xyz/openapi.json
+    x-apievangelist-fetched: '2026-09-19'
+- target: $.servers
+  update:
+  - url: https://verify.agenthealthmonitor.xyz
+    description: Production
+- target: $.components
+  update:
+    securitySchemes:
+      X402Payment:
+        type: apiKey
+        in: header
+        name: X-PAYMENT
+        description: x402 v2 pay-per-verdict; 402 challenge observed live on POST /v1/outputs (amount 500000 = $0.50 USDC
+          on eip155:8453).
+- target: $.paths['/v1/outputs'].post
+  update:
+    security:
+    - X402Payment: []
+    x-x402-price: $0.50
+    x-x402-network: eip155:8453
+    responses:
+      '402':
+        description: x402 payment required; challenge in the PAYMENT-REQUIRED header

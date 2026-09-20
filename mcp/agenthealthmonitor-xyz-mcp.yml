@@ -1,0 +1,264 @@
+generated: '2026-09-19'
+method: derived
+status: candidate
+source: openapi/agenthealthmonitor-xyz-openapi.yml (one candidate tool per public, agent-callable operationId)
+summary: 'No MCP server exists for Agent Health Monitor. Searched: POST tools/list to https://agenthealthmonitor.xyz/mcp (404),
+  /mcp/sse and /sse (404), mcp.agenthealthmonitor.xyz (does not resolve), /.well-known/mcp.json (404); npm has no ahm-shield
+  / @ahm/* / agenthealthmonitor package (the npm package agent-health-monitor 0.1.0 is an unrelated third-party CLI for detecting
+  coding-agent session degradation); PyPI has only ahm-shield, a REST client; the provider''s GitHub account (moonshot-cyber)
+  has no MCP repository and its skills repo carries no AHM entry; the docs, README and roadmap never mention MCP. The provider''s
+  agent surfaces are x402 (pay-per-call HTTP 402), an ERC-8004 registration and a legacy-path A2A card whose endpoint is not
+  deployed. The tool list below is DERIVED from the OpenAPI as a starting point and asserts nothing about the provider.'
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: api-key
+  verified: searched
+  note: 'mode none = nobody ships a server; this file is a derived candidate. auth reflects what a real server would need:
+    the REST API takes an X-API-Key header (fiat key, ahm_live_ prefix) or an x402 USDC payment per call; there is no OAuth.'
+server:
+  name: agenthealthmonitor-xyz
+  transport: null
+  url: null
+tool_count: 21
+tools:
+- name: get_premium_risk_score_risk_premium__address__get
+  description: Get Premium Risk Score — Premium risk score enriched with Nansen wallet intelligence, PnL data,
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_premium_risk_score_risk_premium__address__get
+  method: GET
+  path: /risk/premium/{address}
+  x402_price: $0.05
+- name: get_counterparties_counterparties__address__get
+  description: Get Counterparties — Know Your Counterparty — top wallets/contracts this address interacts with.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_counterparties_counterparties__address__get
+  method: GET
+  path: /counterparties/{address}
+  x402_price: $0.10
+- name: get_network_map_network_map__address__get
+  description: Get Network Map — Wallet Network Map — related wallets linked by funding, deployment, or multisig.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_network_map_network_map__address__get
+  method: GET
+  path: /network-map/{address}
+  x402_price: $0.10
+- name: get_risk_score_risk__address__get
+  description: Get Risk Score — Quick risk score for agent pre-flight checks.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_risk_score_risk__address__get
+  method: GET
+  path: /risk/{address}
+  x402_price: $0.001
+- name: get_health_report_health__address__get
+  description: Get Health Report — Analyze a Base wallet address and return a health report.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_health_report_health__address__get
+  method: GET
+  path: /health/{address}
+  x402_price: $0.50
+- name: get_wash_report_wash__address__post
+  description: 'Get Wash Report — Agent Wash: Hygiene scan for Base wallet addresses.'
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_wash_report_wash__address__post
+  method: POST
+  path: /wash/{address}
+  x402_price: $0.50
+- name: get_ahs_report_ahs__address__get
+  description: 'Get Ahs Report — Agent Health Score: Composite 0-100 index for on-chain agent wallets.'
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_ahs_report_ahs__address__get
+  method: GET
+  path: /ahs/{address}
+  x402_price: $1.00
+- name: get_routing_policy_ahs_route_policy_get
+  description: Get Routing Policy — Return the caller's current routing policy configuration.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_routing_policy_ahs_route_policy_get
+  method: GET
+  path: /ahs/route/policy
+- name: put_routing_policy_ahs_route_policy_put
+  description: Put Routing Policy — Create or update the caller's routing policy.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#put_routing_policy_ahs_route_policy_put
+  method: PUT
+  path: /ahs/route/policy
+  x402_price: $0.01
+- name: get_trust_route_ahs_route__address__get
+  description: Get Trust Route — Lightweight trust routing signal from the most recent cached AHS score.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_trust_route_ahs_route__address__get
+  method: GET
+  path: /ahs/route/{address}
+  x402_price: $0.01
+- name: get_ahs_batch_ahs_batch_post
+  description: 'Get Ahs Batch — Batch Agent Health Score: score multiple wallets in a single call.'
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_ahs_batch_ahs_batch_post
+  method: POST
+  path: /ahs/batch
+  x402_price: $10.00
+- name: get_report_card_report_card__address__get
+  description: 'Get Report Card — Agent Report Card: Visual health report card with ecosystem benchmarks.'
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_report_card_report_card__address__get
+  method: GET
+  path: /report-card/{address}
+  x402_price: '2.00'
+- name: get_optimization_report_optimize__address__get
+  description: Get Optimization Report — Analyze a Base wallet and return a gas optimization report.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_optimization_report_optimize__address__get
+  method: GET
+  path: /optimize/{address}
+  x402_price: $5.00
+- name: protection_preview_agent_protect_preview__address__get
+  description: Protection Preview — Free preview of protection agent analysis.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#protection_preview_agent_protect_preview__address__get
+  method: GET
+  path: /agent/protect/preview/{address}
+  x402_price: free
+- name: get_protection_report_agent_protect__address__get
+  description: Get Protection Report — Autonomous protection agent — full wallet analysis and action plan.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_protection_report_agent_protect__address__get
+  method: GET
+  path: /agent/protect/{address}
+  x402_price: $25.00
+- name: retry_preview_retry_preview__address__get
+  description: Retry Preview — Free preview of retryable failed transactions.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#retry_preview_retry_preview__address__get
+  method: GET
+  path: /retry/preview/{address}
+  x402_price: free
+- name: get_retry_transactions_retry__address__get
+  description: Get Retry Transactions — Analyze failed transactions and return optimized retry transactions.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#get_retry_transactions_retry__address__get
+  method: GET
+  path: /retry/{address}
+  x402_price: $10.00
+- name: subscribe_alerts_alerts_subscribe__address__get
+  description: Subscribe Alerts — Subscribe a wallet to automated health monitoring (30 days).
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#subscribe_alerts_alerts_subscribe__address__get
+  method: GET
+  path: /alerts/subscribe/{address}
+  x402_price: $2.00
+- name: configure_alerts_alerts_configure_post
+  description: Configure Alerts — Configure webhook and thresholds for an active alert subscription.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#configure_alerts_alerts_configure_post
+  method: POST
+  path: /alerts/configure
+  x402_price: free (requires an active alert subscription)
+- name: alert_status_alerts_status__address__get
+  description: Alert Status — Check the status of an alert subscription.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#alert_status_alerts_status__address__get
+  method: GET
+  path: /alerts/status/{address}
+  x402_price: free (requires an active alert subscription)
+- name: unsubscribe_alerts_alerts_unsubscribe__address__delete
+  description: Unsubscribe Alerts — Remove an alert subscription.
+  source_operation: openapi/agenthealthmonitor-xyz-openapi.yml#unsubscribe_alerts_alerts_unsubscribe__address__delete
+  method: DELETE
+  path: /alerts/unsubscribe/{address}
+  x402_price: free (requires an active alert subscription)
+excluded_operations:
+  note: 'Operations left out of the candidate list because they are not agent-callable surfaces: HTML pages and discovery/info
+    routes (Discovery & Info), partner coupon routes (Coupon Access — require a partner coupon code in the path), Stripe billing
+    and checkout routes (Billing), routes protected by X-Internal-Key (Admin), and the chat/liveness utilities.'
+  operations:
+  - operationId: root__get
+    tag: Discovery & Info
+  - operationId: app_page_app_get
+    tag: Discovery & Info
+  - operationId: shield_page_shield_get
+    tag: Discovery & Info
+  - operationId: verify_page_verify_get
+    tag: Discovery & Info
+  - operationId: roadmap_roadmap_get
+    tag: Discovery & Info
+  - operationId: agent_registration__well_known_agent_registration_json_get
+    tag: Discovery & Info
+  - operationId: a2a_agent_card__well_known_agent_json_get
+    tag: Discovery & Info
+  - operationId: verify_402index__well_known_402index_verify_txt_get
+    tag: Discovery & Info
+  - operationId: x402_discovery__well_known_x402_get
+    tag: Discovery & Info
+  - operationId: api_info_api_info_get
+    tag: Discovery & Info
+  - operationId: ecosystem_stats_api_ecosystem_stats_get
+    tag: Discovery & Info
+  - operationId: leaderboard_api_leaderboard_get
+    tag: Discovery & Info
+  - operationId: get_agent_public_api_agent__address__get
+    tag: Discovery & Info
+  - operationId: scan_quality_scan_quality_get
+    tag: Discovery & Info
+  - operationId: dashboard_dashboard_get
+    tag: Discovery & Info
+  - operationId: pay_by_card_pay_by_card_get
+    tag: Discovery & Info
+  - operationId: endpoint_info_api_endpoint_info__slug__get
+    tag: Discovery & Info
+  - operationId: endpoint_page_endpoints__slug__get
+    tag: Discovery & Info
+  - operationId: validate_coupon_coupon_validate__code__get
+    tag: Coupon Access
+  - operationId: coupon_risk_coupon_risk__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_health_coupon_health__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_optimize_coupon_optimize__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_retry_coupon_retry__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_protect_coupon_protect__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_alerts_coupon_alerts__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_premium_risk_coupon_risk_premium__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_counterparties_coupon_counterparties__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_network_map_coupon_network_map__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_wash_coupon_wash__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_ahs_coupon_ahs__code___address__get
+    tag: Coupon Access
+  - operationId: coupon_report_card_coupon_report_card__code___address__get
+    tag: Coupon Access
+  - operationId: chat_chat_post
+    tag: Utility
+  - operationId: up_up_get
+    tag: Utility
+  - operationId: stripe_webhook_stripe_webhook_post
+    tag: Billing
+  - operationId: stripe_webhook_test_stripe_webhook_test_post
+    tag: Billing
+  - operationId: retrieve_key_stripe_key__session_id__get
+    tag: Billing
+  - operationId: checkout_success_page_checkout_success_get
+    tag: Billing
+  - operationId: shield_subscribe_shield_subscribe_post
+    tag: Billing
+  - operationId: api_key_status_api_key_status_get
+    tag: Billing
+  - operationId: partner_usage_partners__partner_id__usage_get
+    tag: Billing
+  - operationId: security_activity_security_activity_get
+    tag: Admin
+  - operationId: trust_registry_trust_registry_get
+    tag: Admin
+  - operationId: internal_agent_profile_internal_agent_profile__address__get
+    tag: Admin
+  - operationId: trigger_acp_scan_acp_scan_trigger_post
+    tag: Admin
+  - operationId: acp_scan_status_acp_scan_status_get
+    tag: Admin
+  - operationId: trigger_olas_scan_olas_scan_trigger_post
+    tag: Admin
+  - operationId: olas_scan_status_olas_scan_status_get
+    tag: Admin
+  - operationId: trigger_arc_scan_arc_scan_trigger_post
+    tag: Admin
+  - operationId: arc_scan_status_arc_scan_status_get
+    tag: Admin
+  - operationId: trigger_celo_scan_celo_scan_trigger_post
+    tag: Admin
+  - operationId: celo_scan_status_celo_scan_status_get
+    tag: Admin
+  - operationId: trigger_erc8004_scan_erc8004_scan_trigger_post
+    tag: Admin
+  - operationId: erc8004_scan_status_erc8004_scan_status_get
+    tag: Admin
+  - operationId: erc8183_status_erc8183_status_get
+    tag: Admin

@@ -1,0 +1,1044 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/agenthealthmonitor-xyz-openapi.yml — components.schemas $ref graph (53 schemas) and each operation's requestBody/200
+  response schema; the wallet address is the only identifier and it is external (an Ethereum address), so there are no provider-minted
+  id prefixes.
+summary: 'AHM has no persisted customer-visible objects with ids: every paid operation takes a wallet `address` (0x + 40 hex)
+  and returns a report envelope (`*Response` wrapping a `*Report`). The one stateful object is the alert Subscription (created
+  by /alerts/subscribe, shaped by ConfigureRequest/AlertThresholds, readable at /alerts/status), plus the caller''s RoutingPolicy
+  (RoutingPolicyRequest/Response, keyed on the caller). The AHS family is the richest graph: AHSResponse -> AHSReport -> AHSDimensionScore[],
+  AHSCrossDimensionalPattern[], AHSShadowSignals, Recommendation[]; batch wraps it as AHSBatchResponse -> AHSBatchResultItem[].
+  Nansen enrichment appears as NansenLabel, Counterparty, RelatedWallet, PnlSummary/PnlTokenSummary, OperationalHealth on
+  the premium/counterparty/network-map responses. Errors: HTTPValidationError -> ValidationError[].'
+root_identifier:
+  name: address
+  type: Ethereum wallet address (EIP-55/hex, 0x-prefixed, 40 hex chars)
+  minted_by: external (the chain), never by AHM
+  example: 0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae (from the spec examples)
+entity_count: 53
+relationship_count: 34
+entities:
+- name: AHSBatchRequest
+  fields: 3
+  required:
+  - addresses
+  key_fields:
+  - addresses
+  - page
+  - page_size
+- name: AHSBatchResponse
+  fields: 8
+  required:
+  - results
+  - page
+  - page_size
+  - total_addresses
+  - total_scored
+  - credits_used
+  - errors
+  key_fields:
+  - results
+  - page
+  - page_size
+  - total_addresses
+  - total_scored
+  - credits_used
+  - credits_remaining
+  - errors
+- name: AHSBatchResultItem
+  fields: 8
+  required:
+  - address
+  - ahs_score
+  - grade
+  - d1_score
+  - d2_score
+  - pattern
+  - verdict
+  - routing_recommendation
+  key_fields:
+  - address
+  - ahs_score
+  - grade
+  - d1_score
+  - d2_score
+  - pattern
+  - verdict
+  - routing_recommendation
+- name: AHSCrossDimensionalPattern
+  fields: 4
+  required:
+  - name
+  - detected
+  - severity
+  - description
+  key_fields:
+  - name
+  - detected
+  - severity
+  - description
+- name: AHSDimensionScore
+  fields: 4
+  required:
+  - dimension
+  - score
+  - weight
+  - contributing_factors
+  key_fields:
+  - dimension
+  - score
+  - weight
+  - contributing_factors
+- name: AHSReport
+  fields: 15
+  required:
+  - address
+  - agent_health_score
+  - grade
+  - confidence
+  - mode
+  - dimensions
+  - patterns_detected
+  - recommendations
+  - ahs_token
+  - model_version
+  - scan_timestamp
+  - next_scan_recommended
+  - routing_recommendation
+  key_fields:
+  - address
+  - agent_health_score
+  - grade
+  - confidence
+  - mode
+  - dimensions
+  - patterns_detected
+  - trend
+  - recommendations
+  - ahs_token
+  - model_version
+  - scan_timestamp
+- name: AHSResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+- name: AHSShadowSignals
+  fields: 6
+  required: []
+  key_fields:
+  - session_continuity_score
+  - abrupt_sessions
+  - budget_exhaustion_count
+  - total_sessions
+  - avg_session_length
+  - shadow_patterns
+- name: AgentPublicProfile
+  fields: 13
+  required:
+  - address
+  key_fields:
+  - address
+  - agent_name
+  - registries
+  - source
+  - latest_ahs
+  - latest_grade
+  - rank
+  - percentile_rank
+  - first_seen_at
+  - last_scanned_at
+  - scan_count
+  - gap_to_next_rank
+- name: AlertThresholds
+  fields: 3
+  required: []
+  key_fields:
+  - health_score
+  - failure_rate
+  - waste_usd
+- name: ChatRequest
+  fields: 2
+  required:
+  - message
+  key_fields:
+  - message
+  - context
+- name: ConfigureRequest
+  fields: 4
+  required:
+  - address
+  - webhook_url
+  key_fields:
+  - address
+  - webhook_url
+  - webhook_type
+  - thresholds
+- name: Counterparty
+  fields: 5
+  required:
+  - address
+  key_fields:
+  - address
+  - label
+  - interaction_count
+  - volume_usd
+  - last_interaction
+- name: CounterpartyResponse
+  fields: 5
+  required:
+  - status
+  - address
+  key_fields:
+  - status
+  - address
+  - counterparties
+  - total_counterparties
+  - nansen_available
+- name: EcosystemComparison
+  fields: 4
+  required:
+  - percentile_rank
+  - grade_distribution
+  - total_agents_scored
+  key_fields:
+  - average_ahs
+  - percentile_rank
+  - grade_distribution
+  - total_agents_scored
+- name: GasOptimizationReport
+  fields: 11
+  required:
+  - address
+  - total_transactions_analyzed
+  - current_monthly_gas_usd
+  - optimized_monthly_gas_usd
+  - estimated_monthly_savings_usd
+  - total_wasted_gas_eth
+  - total_wasted_gas_usd
+  - tx_types
+  - recommendations
+  - eth_price_usd
+  - analyzed_at
+  key_fields:
+  - address
+  - total_transactions_analyzed
+  - current_monthly_gas_usd
+  - optimized_monthly_gas_usd
+  - estimated_monthly_savings_usd
+  - total_wasted_gas_eth
+  - total_wasted_gas_usd
+  - tx_types
+  - recommendations
+  - eth_price_usd
+  - analyzed_at
+- name: HTTPValidationError
+  fields: 1
+  required: []
+  key_fields:
+  - detail
+- name: HealthReport
+  fields: 22
+  required:
+  - address
+  - is_contract
+  - health_score
+  - optimization_priority
+  - total_transactions
+  - successful
+  - failed
+  - success_rate_pct
+  - total_gas_spent_eth
+  - wasted_gas_eth
+  - estimated_monthly_waste_usd
+  - avg_gas_efficiency_pct
+  - out_of_gas_count
+  - reverted_count
+  - nonce_gap_count
+  - retry_count
+  - top_failure_type
+  - first_seen
+  - last_seen
+  - recommendations
+  - eth_price_usd
+  - analyzed_at
+  key_fields:
+  - address
+  - is_contract
+  - health_score
+  - optimization_priority
+  - total_transactions
+  - successful
+  - failed
+  - success_rate_pct
+  - total_gas_spent_eth
+  - wasted_gas_eth
+  - estimated_monthly_waste_usd
+  - avg_gas_efficiency_pct
+- name: HealthResponse
+  fields: 6
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+  - nansen_labels
+  - nansen_available
+  - token_balances
+  - total_portfolio_usd
+- name: NansenLabel
+  fields: 3
+  required:
+  - label
+  key_fields:
+  - label
+  - category
+  - definition
+- name: OperationalHealth
+  fields: 8
+  required: []
+  key_fields:
+  - tx_failure_rate_1hr
+  - tx_failure_rate_24hr
+  - total_txs_1hr
+  - total_txs_24hr
+  - nonce_gaps_detected
+  - volume_anomaly
+  - health_status
+  - health_detail
+- name: OptimizeResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+- name: OptimizedTransaction
+  fields: 6
+  required:
+  - to
+  - data
+  - value
+  - gas_limit
+  - max_fee_per_gas
+  - max_priority_fee_per_gas
+  key_fields:
+  - to
+  - data
+  - value
+  - gas_limit
+  - max_fee_per_gas
+  - max_priority_fee_per_gas
+- name: PnlSummary
+  fields: 6
+  required: []
+  key_fields:
+  - realized_pnl_usd
+  - realized_pnl_percent
+  - win_rate
+  - traded_token_count
+  - traded_times
+  - top_tokens
+- name: PnlTokenSummary
+  fields: 4
+  required:
+  - token_symbol
+  - chain
+  - realized_pnl
+  - realized_roi
+  key_fields:
+  - token_symbol
+  - chain
+  - realized_pnl
+  - realized_roi
+- name: PremiumRiskResponse
+  fields: 8
+  required:
+  - risk_score
+  - risk_level
+  - verdict
+  - nansen_labels
+  - nansen_available
+  key_fields:
+  - risk_score
+  - risk_level
+  - verdict
+  - nansen_labels
+  - nansen_available
+  - pnl_summary
+  - pnl_available
+  - operational_health
+- name: ProtectionActionItem
+  fields: 5
+  required:
+  - priority
+  - action
+  - description
+  key_fields:
+  - priority
+  - action
+  - description
+  - potential_value_usd
+  - potential_savings_monthly_usd
+- name: ProtectionPreviewResponse
+  fields: 7
+  required:
+  - status
+  - address
+  - risk_level
+  - health_score
+  - services_recommended
+  - estimated_issues
+  - message
+  key_fields:
+  - status
+  - address
+  - risk_level
+  - health_score
+  - services_recommended
+  - estimated_issues
+  - message
+- name: ProtectionReport
+  fields: 10
+  required:
+  - address
+  - risk_level
+  - health_score
+  - services_run
+  - summary
+  - health_report
+  - recommended_actions
+  - analyzed_at
+  key_fields:
+  - address
+  - risk_level
+  - health_score
+  - services_run
+  - summary
+  - health_report
+  - gas_optimization
+  - retry_transactions
+  - recommended_actions
+  - analyzed_at
+- name: ProtectionResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+- name: ProtectionSummaryModel
+  fields: 4
+  required:
+  - total_issues_found
+  - total_potential_savings_usd
+  - retry_transactions_ready
+  - estimated_retry_cost_usd
+  key_fields:
+  - total_issues_found
+  - total_potential_savings_usd
+  - retry_transactions_ready
+  - estimated_retry_cost_usd
+- name: Recommendation
+  fields: 3
+  required:
+  - category
+  - severity
+  - message
+  key_fields:
+  - category
+  - severity
+  - message
+- name: RelatedWallet
+  fields: 6
+  required:
+  - address
+  - relation
+  - chain
+  key_fields:
+  - address
+  - label
+  - relation
+  - chain
+  - transaction_hash
+  - block_timestamp
+- name: RelatedWalletsResponse
+  fields: 6
+  required:
+  - status
+  - address
+  - chain
+  key_fields:
+  - status
+  - address
+  - chain
+  - related_wallets
+  - total_related
+  - nansen_available
+- name: ReportCardDimension
+  fields: 3
+  required:
+  - dimension
+  - weight
+  key_fields:
+  - dimension
+  - score
+  - weight
+- name: ReportCardReport
+  fields: 11
+  required:
+  - address
+  - agent_health_score
+  - grade
+  - confidence
+  - mode
+  - dimensions
+  - patterns_detected
+  - recommendations
+  - ecosystem_comparison
+  - image_url
+  - share_url
+  key_fields:
+  - address
+  - agent_health_score
+  - grade
+  - confidence
+  - mode
+  - dimensions
+  - patterns_detected
+  - recommendations
+  - ecosystem_comparison
+  - image_url
+  - share_url
+- name: ReportCardResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+- name: RetryPreviewResponse
+  fields: 7
+  required:
+  - status
+  - address
+  - failed_transactions_analyzed
+  - retryable_count
+  - total_estimated_retry_cost_usd
+  - potential_value_recovered_usd
+  - message
+  key_fields:
+  - status
+  - address
+  - failed_transactions_analyzed
+  - retryable_count
+  - total_estimated_retry_cost_usd
+  - potential_value_recovered_usd
+  - message
+- name: RetryReport
+  fields: 7
+  required:
+  - address
+  - failed_transactions_analyzed
+  - retryable_count
+  - retry_transactions
+  - total_estimated_retry_cost_usd
+  - potential_value_recovered_usd
+  - analyzed_at
+  key_fields:
+  - address
+  - failed_transactions_analyzed
+  - retryable_count
+  - retry_transactions
+  - total_estimated_retry_cost_usd
+  - potential_value_recovered_usd
+  - analyzed_at
+- name: RetryResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+- name: RetryTransactionItem
+  fields: 5
+  required:
+  - original_tx_hash
+  - failure_reason
+  - optimized_transaction
+  - estimated_gas_cost_usd
+  - confidence
+  key_fields:
+  - original_tx_hash
+  - failure_reason
+  - optimized_transaction
+  - estimated_gas_cost_usd
+  - confidence
+- name: RiskResponse
+  fields: 3
+  required:
+  - risk_score
+  - risk_level
+  - verdict
+  key_fields:
+  - risk_score
+  - risk_level
+  - verdict
+- name: RoutingPolicyRequest
+  fields: 6
+  required:
+  - instant_grades
+  - escrow_grades
+  - reject_grades
+  key_fields:
+  - instant_grades
+  - escrow_grades
+  - reject_grades
+  - escrow_disabled
+  - allowlist
+  - confidence_overrides
+- name: RoutingPolicyResponse
+  fields: 7
+  required:
+  - instant_grades
+  - escrow_grades
+  - reject_grades
+  - escrow_disabled
+  - allowlist_count
+  - updated_at
+  key_fields:
+  - instant_grades
+  - escrow_grades
+  - reject_grades
+  - escrow_disabled
+  - allowlist_count
+  - confidence_overrides
+  - updated_at
+- name: ShieldSubscribeRequest
+  fields: 3
+  required:
+  - tier
+  key_fields:
+  - tier
+  - success_url
+  - cancel_url
+- name: TestWebhookRequest
+  fields: 4
+  required:
+  - email
+  key_fields:
+  - email
+  - tier
+  - key_type
+  - calls
+- name: TokenBalance
+  fields: 5
+  required:
+  - chain
+  - symbol
+  - name
+  - amount
+  - usd_value
+  key_fields:
+  - chain
+  - symbol
+  - name
+  - amount
+  - usd_value
+- name: TransactionTypeOptimization
+  fields: 13
+  required:
+  - contract
+  - method_id
+  - method_label
+  - tx_count
+  - failed_count
+  - failure_rate_pct
+  - current_avg_gas_limit
+  - current_p50_gas_used
+  - current_p95_gas_used
+  - optimal_gas_limit
+  - gas_limit_reduction_pct
+  - wasted_gas_eth
+  - wasted_gas_usd
+  key_fields:
+  - contract
+  - method_id
+  - method_label
+  - tx_count
+  - failed_count
+  - failure_rate_pct
+  - current_avg_gas_limit
+  - current_p50_gas_used
+  - current_p95_gas_used
+  - optimal_gas_limit
+  - gas_limit_reduction_pct
+  - wasted_gas_eth
+- name: TrustRouteResponse
+  fields: 9
+  required:
+  - address
+  - agent_health_score
+  - grade
+  - routing_recommendation
+  - confidence
+  - scored_at
+  - stale
+  key_fields:
+  - address
+  - agent_health_score
+  - grade
+  - routing_recommendation
+  - confidence
+  - scored_at
+  - stale
+  - policy_applied
+  - allowlisted
+- name: ValidationError
+  fields: 5
+  required:
+  - loc
+  - msg
+  - type
+  key_fields:
+  - loc
+  - msg
+  - type
+  - input
+  - ctx
+- name: WashIssue
+  fields: 5
+  required:
+  - category
+  - severity
+  - description
+  - action
+  key_fields:
+  - category
+  - severity
+  - description
+  - action
+  - estimated_savings
+- name: WashReport
+  fields: 19
+  required:
+  - address
+  - cleanliness_score
+  - cleanliness_grade
+  - total_issues
+  - issues_by_severity
+  - dust_tokens
+  - dust_total_usd
+  - spam_tokens
+  - spam_token_list
+  - gas_efficiency_pct
+  - gas_efficiency_grade
+  - wasted_gas_usd
+  - failed_tx_count_24hr
+  - failed_tx_patterns
+  - nonce_gaps
+  - issues
+  - recommendations
+  - scan_timestamp
+  - next_wash_recommended
+  key_fields:
+  - address
+  - cleanliness_score
+  - cleanliness_grade
+  - total_issues
+  - issues_by_severity
+  - dust_tokens
+  - dust_total_usd
+  - spam_tokens
+  - spam_token_list
+  - gas_efficiency_pct
+  - gas_efficiency_grade
+  - wasted_gas_usd
+- name: WashResponse
+  fields: 2
+  required:
+  - status
+  - report
+  key_fields:
+  - status
+  - report
+relationships:
+- from: AHSBatchResponse
+  to: AHSBatchResultItem
+  type: has_many
+  via: results
+- from: AHSReport
+  to: AHSDimensionScore
+  type: has_many
+  via: dimensions
+- from: AHSReport
+  to: AHSCrossDimensionalPattern
+  type: has_many
+  via: patterns_detected
+- from: AHSReport
+  to: AHSShadowSignals
+  type: has_one
+  via: shadow_signals
+- from: AHSResponse
+  to: AHSReport
+  type: has_one
+  via: report
+- from: ConfigureRequest
+  to: AlertThresholds
+  type: has_one
+  via: thresholds
+- from: CounterpartyResponse
+  to: Counterparty
+  type: has_many
+  via: counterparties
+- from: GasOptimizationReport
+  to: TransactionTypeOptimization
+  type: has_many
+  via: tx_types
+- from: HTTPValidationError
+  to: ValidationError
+  type: has_many
+  via: detail
+- from: HealthReport
+  to: Recommendation
+  type: has_many
+  via: recommendations
+- from: HealthResponse
+  to: HealthReport
+  type: has_one
+  via: report
+- from: HealthResponse
+  to: NansenLabel
+  type: has_many
+  via: nansen_labels
+- from: HealthResponse
+  to: TokenBalance
+  type: has_many
+  via: token_balances
+- from: OptimizeResponse
+  to: GasOptimizationReport
+  type: has_one
+  via: report
+- from: PnlSummary
+  to: PnlTokenSummary
+  type: has_many
+  via: top_tokens
+- from: PremiumRiskResponse
+  to: NansenLabel
+  type: has_many
+  via: nansen_labels
+- from: PremiumRiskResponse
+  to: PnlSummary
+  type: has_one
+  via: pnl_summary
+- from: PremiumRiskResponse
+  to: OperationalHealth
+  type: has_one
+  via: operational_health
+- from: ProtectionReport
+  to: ProtectionSummaryModel
+  type: has_one
+  via: summary
+- from: ProtectionReport
+  to: HealthReport
+  type: has_one
+  via: health_report
+- from: ProtectionReport
+  to: GasOptimizationReport
+  type: has_one
+  via: gas_optimization
+- from: ProtectionReport
+  to: RetryTransactionItem
+  type: has_many
+  via: retry_transactions
+- from: ProtectionReport
+  to: ProtectionActionItem
+  type: has_many
+  via: recommended_actions
+- from: ProtectionResponse
+  to: ProtectionReport
+  type: has_one
+  via: report
+- from: RelatedWalletsResponse
+  to: RelatedWallet
+  type: has_many
+  via: related_wallets
+- from: ReportCardReport
+  to: ReportCardDimension
+  type: has_many
+  via: dimensions
+- from: ReportCardReport
+  to: AHSCrossDimensionalPattern
+  type: has_many
+  via: patterns_detected
+- from: ReportCardReport
+  to: EcosystemComparison
+  type: has_one
+  via: ecosystem_comparison
+- from: ReportCardResponse
+  to: ReportCardReport
+  type: has_one
+  via: report
+- from: RetryReport
+  to: RetryTransactionItem
+  type: has_many
+  via: retry_transactions
+- from: RetryResponse
+  to: RetryReport
+  type: has_one
+  via: report
+- from: RetryTransactionItem
+  to: OptimizedTransaction
+  type: has_one
+  via: optimized_transaction
+- from: WashReport
+  to: WashIssue
+  type: has_many
+  via: issues
+- from: WashResponse
+  to: WashReport
+  type: has_one
+  via: report
+operation_schemas:
+- operationId: get_agent_public_api_agent__address__get
+  method: GET
+  path: /api/agent/{address}
+  request: []
+  response:
+  - AgentPublicProfile
+- operationId: chat_chat_post
+  method: POST
+  path: /chat
+  request:
+  - ChatRequest
+  response: []
+- operationId: get_premium_risk_score_risk_premium__address__get
+  method: GET
+  path: /risk/premium/{address}
+  request: []
+  response:
+  - PremiumRiskResponse
+- operationId: get_counterparties_counterparties__address__get
+  method: GET
+  path: /counterparties/{address}
+  request: []
+  response:
+  - CounterpartyResponse
+- operationId: get_network_map_network_map__address__get
+  method: GET
+  path: /network-map/{address}
+  request: []
+  response:
+  - RelatedWalletsResponse
+- operationId: get_risk_score_risk__address__get
+  method: GET
+  path: /risk/{address}
+  request: []
+  response:
+  - RiskResponse
+- operationId: get_health_report_health__address__get
+  method: GET
+  path: /health/{address}
+  request: []
+  response:
+  - HealthResponse
+- operationId: get_wash_report_wash__address__post
+  method: POST
+  path: /wash/{address}
+  request: []
+  response:
+  - WashResponse
+- operationId: get_ahs_report_ahs__address__get
+  method: GET
+  path: /ahs/{address}
+  request: []
+  response:
+  - AHSResponse
+- operationId: get_routing_policy_ahs_route_policy_get
+  method: GET
+  path: /ahs/route/policy
+  request: []
+  response:
+  - RoutingPolicyResponse
+- operationId: put_routing_policy_ahs_route_policy_put
+  method: PUT
+  path: /ahs/route/policy
+  request:
+  - RoutingPolicyRequest
+  response:
+  - RoutingPolicyResponse
+- operationId: get_trust_route_ahs_route__address__get
+  method: GET
+  path: /ahs/route/{address}
+  request: []
+  response:
+  - TrustRouteResponse
+- operationId: get_ahs_batch_ahs_batch_post
+  method: POST
+  path: /ahs/batch
+  request:
+  - AHSBatchRequest
+  response:
+  - AHSBatchResponse
+- operationId: get_report_card_report_card__address__get
+  method: GET
+  path: /report-card/{address}
+  request: []
+  response:
+  - ReportCardResponse
+- operationId: get_optimization_report_optimize__address__get
+  method: GET
+  path: /optimize/{address}
+  request: []
+  response:
+  - OptimizeResponse
+- operationId: protection_preview_agent_protect_preview__address__get
+  method: GET
+  path: /agent/protect/preview/{address}
+  request: []
+  response:
+  - ProtectionPreviewResponse
+- operationId: get_protection_report_agent_protect__address__get
+  method: GET
+  path: /agent/protect/{address}
+  request: []
+  response:
+  - ProtectionResponse
+- operationId: retry_preview_retry_preview__address__get
+  method: GET
+  path: /retry/preview/{address}
+  request: []
+  response:
+  - RetryPreviewResponse
+- operationId: get_retry_transactions_retry__address__get
+  method: GET
+  path: /retry/{address}
+  request: []
+  response:
+  - RetryResponse
+- operationId: configure_alerts_alerts_configure_post
+  method: POST
+  path: /alerts/configure
+  request:
+  - ConfigureRequest
+  response: []
+- operationId: stripe_webhook_test_stripe_webhook_test_post
+  method: POST
+  path: /stripe/webhook/test
+  request:
+  - TestWebhookRequest
+  response: []
+- operationId: shield_subscribe_shield_subscribe_post
+  method: POST
+  path: /shield/subscribe
+  request:
+  - ShieldSubscribeRequest
+  response: []
