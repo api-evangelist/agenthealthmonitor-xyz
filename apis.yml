@@ -32,7 +32,7 @@ tags:
 - x402
 - Agentic Commerce
 - Monitoring
-- Webhooks
+- Webhook
 - Web3
 - Verifiable Credentials
 - Developer Tools
@@ -66,6 +66,12 @@ apis:
   image: https://agenthealthmonitor.xyz/static/ahm-logo.png
   baseURL: https://agenthealthmonitor.xyz
   tags:
+  - Agents
+  - Risk Scoring
+  - Wallet Intelligence
+  - x402
+  - Webhook
+  tags_raw:
   - Agents
   - Risk Scoring
   - Wallet Intelligence
