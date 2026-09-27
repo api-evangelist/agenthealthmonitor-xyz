@@ -1,0 +1,111 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Utility API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Utility across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Utility
+  description: Health checks and AI chat assistant.
+paths:
+  /chat:
+    post:
+      tags:
+      - Utility
+      summary: Chat
+      description: AI chat about wallet analysis results.
+      operationId: chat_chat_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /up:
+    get:
+      tags:
+      - Utility
+      summary: Up
+      description: Unpaid liveness probe for load balancers.
+      operationId: up_up_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    ChatRequest:
+      properties:
+        message:
+          type: string
+          title: Message
+        context:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Context
+      type: object
+      required:
+      - message
+      title: ChatRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

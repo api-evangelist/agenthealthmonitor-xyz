@@ -1,0 +1,127 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Outputs API
+  version: 0.1.0
+  description: 'Operations tagged Outputs across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-verify-openapi.json, agenthealthmonitor-xyz-verify-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://verify.agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://verify.agenthealthmonitor.xyz/openapi.json declares no servers[]; the host is the one that serves the spec and its Swagger UI (/docs) and is named as "Live at: verify.agenthealthmonitor.xyz" on docs.agenthealthmonitor.xyz. Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Outputs
+paths:
+  /v1/outputs:
+    post:
+      summary: Submit Output
+      description: Submit an agent's output for evaluation. Triggers async panel pipeline.
+      operationId: submit_output_v1_outputs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutputRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Outputs
+components:
+  schemas:
+    OutputResponse:
+      properties:
+        verdict_id:
+          type: string
+          title: Verdict Id
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - verdict_id
+      - status
+      title: OutputResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    OutputRequest:
+      properties:
+        spec_id:
+          type: string
+          title: Spec Id
+          description: UUID of the pre-registered spec
+        output_text:
+          type: string
+          minLength: 1
+          title: Output Text
+          description: The agent's delivered output text
+        submitted_by:
+          type: string
+          title: Submitted By
+          description: 'Who submitted: client, agent, or protocol'
+          default: client
+        submitter_addr:
+          type: string
+          title: Submitter Addr
+          description: Wallet address of the submitter
+        provider_addr:
+          type: string
+          title: Provider Addr
+          description: Wallet address of the agent/provider
+        mode:
+          type: string
+          title: Mode
+          description: Evaluation mode. Only 'standard' is implemented — every verdict runs the standard pipeline at $0.50.
+          default: standard
+      type: object
+      required:
+      - spec_id
+      - output_text
+      - submitter_addr
+      - provider_addr
+      title: OutputRequest
+x-refined-from:
+- agenthealthmonitor-xyz-verify-openapi.json
+- agenthealthmonitor-xyz-verify-openapi.yml

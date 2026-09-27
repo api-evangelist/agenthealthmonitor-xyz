@@ -1,0 +1,451 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Discovery & Info API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Discovery & Info across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Discovery & Info
+  description: Service discovery, pricing info, ecosystem statistics, and x402/ERC-8004 well-known documents for automated agent registration.
+paths:
+  /:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Root
+      description: 'Serve the marketing homepage, with its one live figure rendered in.
+
+
+        The hero carries the ecosystem average AHS. It is a changing figure, so it
+
+        is rendered from the database on every request rather than typed into the
+
+        markup — it cannot go stale, and unlike the earlier client-fetched version
+
+        it is present for crawlers, agents and curl instead of showing a dash.'
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    head:
+      tags:
+      - Discovery & Info
+      summary: Root
+      description: 'Serve the marketing homepage, with its one live figure rendered in.
+
+
+        The hero carries the ecosystem average AHS. It is a changing figure, so it
+
+        is rendered from the database on every request rather than typed into the
+
+        markup — it cannot go stale, and unlike the earlier client-fetched version
+
+        it is present for crawlers, agents and curl instead of showing a dash.'
+      operationId: headRoot
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      x-operation-id-source: normalized
+      x-operation-id-original: root__get
+  /app:
+    get:
+      tags:
+      - Discovery & Info
+      summary: App Page
+      description: Serve the developer tool (formerly the homepage).
+      operationId: app_page_app_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /shield:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Shield Page
+      description: Serve the Shield SDK landing page.
+      operationId: shield_page_shield_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /verify:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Verify Page
+      description: Serve the AHM Verify landing page.
+      operationId: verify_page_verify_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /roadmap:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Roadmap
+      description: Serve the roadmap page.
+      operationId: roadmap_roadmap_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /.well-known/agent-registration.json:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Agent Registration
+      description: ERC-8004 agent registration document.
+      operationId: agent_registration__well_known_agent_registration_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /.well-known/agent.json:
+    get:
+      tags:
+      - Discovery & Info
+      summary: A2A Agent Card
+      description: A2A Agent Card — public discovery endpoint per A2A protocol spec.
+      operationId: a2a_agent_card__well_known_agent_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /.well-known/402index-verify.txt:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Verify 402Index
+      description: 402index.io domain verification token.
+      operationId: verify_402index__well_known_402index_verify_txt_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /.well-known/x402:
+    get:
+      tags:
+      - Discovery & Info
+      summary: X402 Discovery
+      description: 'x402 discovery document — lists all paid endpoints with payment
+
+        requirements and bazaar metadata so crawlers like x402scan can
+
+        auto-register the service.'
+      operationId: x402_discovery__well_known_x402_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/info:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Api Info
+      description: Service info and pricing.
+      operationId: api_info_api_info_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/ecosystem-stats:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Ecosystem Stats
+      description: Public aggregate ecosystem stats for the dashboard. No auth required.
+      operationId: ecosystem_stats_api_ecosystem_stats_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/leaderboard:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Leaderboard
+      description: 'Public leaderboard: top 500 named agents by AHS score. No auth required.'
+      operationId: leaderboard_api_leaderboard_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/agent/{address}:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Get Agent Public
+      description: 'Public agent profile: free-safe data for the Intelligence profile page.
+
+
+        Returns composite score, grade, rank, percentile, and gap metrics.
+
+        Dimensional breakdown (D1/D2/…) is excluded — that is the paid product.'
+      operationId: get_agent_public_api_agent__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentPublicProfile'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /scan/quality:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Scan Quality
+      description: Batch quality history for the last 30 days. No auth required.
+      operationId: scan_quality_scan_quality_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /dashboard:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Dashboard
+      description: Serve the public ecosystem health dashboard, server-rendered.
+      operationId: dashboard_dashboard_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /pay-by-card:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Pay By Card
+      description: Serve the card payment landing page.
+      operationId: pay_by_card_pay_by_card_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/endpoint-info/{slug}:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Endpoint Info
+      description: Public endpoint metadata for marketing pages. No auth required.
+      operationId: endpoint_info_api_endpoint_info__slug__get
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Slug
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /endpoints/{slug}:
+    get:
+      tags:
+      - Discovery & Info
+      summary: Endpoint Page
+      description: Serve the endpoint marketing page for any valid slug.
+      operationId: endpoint_page_endpoints__slug__get
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Slug
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AgentPublicProfile:
+      properties:
+        address:
+          type: string
+          title: Address
+        agent_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Name
+        registries:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Registries
+        source:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source
+        latest_ahs:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Latest Ahs
+        latest_grade:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Latest Grade
+        rank:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Rank
+        percentile_rank:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Percentile Rank
+        first_seen_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Seen At
+        last_scanned_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Scanned At
+        scan_count:
+          type: integer
+          title: Scan Count
+          default: 0
+        gap_to_next_rank:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Gap To Next Rank
+        gap_to_next_tier:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Gap To Next Tier
+      type: object
+      required:
+      - address
+      title: AgentPublicProfile
+      description: 'Free-safe agent profile for the public profile page.
+
+
+        This model is the security gate: only explicitly listed fields can be
+
+        serialised.  Dimensional scores (d1, d2, …) are structurally excluded.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

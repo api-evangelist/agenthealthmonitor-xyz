@@ -1,0 +1,320 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Admin API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Admin across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Admin
+  description: Internal admin endpoints protected by X-Internal-Key header. Security activity logs, trust registry, and registry scan triggers.
+paths:
+  /security/activity:
+    get:
+      tags:
+      - Admin
+      summary: Security Activity
+      description: 'Recent security events (rate limits, suspicious patterns).
+
+
+        Protected by X-Internal-Key header. Not accessible via x402 payment.'
+      operationId: security_activity_security_activity_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /trust-registry:
+    get:
+      tags:
+      - Admin
+      summary: Trust Registry
+      description: 'Aggregated scan statistics for the AHM trust layer.
+
+
+        Protected by X-Internal-Key header. Not accessible via x402 payment.'
+      operationId: trust_registry_trust_registry_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /internal/agent-profile/{address}:
+    get:
+      tags:
+      - Admin
+      summary: Internal Agent Profile
+      description: 'Return AHS profile context for a single agent address.
+
+
+        Protected by X-Internal-Key header. Used by ahm-verify to fetch
+
+        agent scoring context for the adjudication panel.'
+      operationId: internal_agent_profile_internal_agent_profile__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Address
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /acp-scan/trigger:
+    post:
+      tags:
+      - Admin
+      summary: Trigger Acp Scan
+      description: 'Manually trigger the ACP nightly scan.
+
+
+        Protected by X-Internal-Key header. Returns immediately;
+
+        scan runs in the background.'
+      operationId: trigger_acp_scan_acp_scan_trigger_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /acp-scan/status:
+    get:
+      tags:
+      - Admin
+      summary: Acp Scan Status
+      description: 'Check if an ACP scan is currently running.
+
+
+        Protected by X-Internal-Key header.'
+      operationId: acp_scan_status_acp_scan_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /olas-scan/trigger:
+    post:
+      tags:
+      - Admin
+      summary: Trigger Olas Scan
+      description: 'Manually trigger the Olas nightly scan.
+
+
+        Protected by X-Internal-Key header. Returns immediately;
+
+        scan runs in the background.'
+      operationId: trigger_olas_scan_olas_scan_trigger_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /olas-scan/status:
+    get:
+      tags:
+      - Admin
+      summary: Olas Scan Status
+      description: 'Check if an Olas scan is currently running.
+
+
+        Protected by X-Internal-Key header.
+
+
+        Also queries ``totalSupply()`` on the Olas ServiceRegistryL2 contract
+
+        on Base so the dashboard can render a live saturation figure
+
+        (e.g. "887 / 900") instead of looking stalled when the nightly
+
+        scanner has already caught up to the registry. Any RPC failure is
+
+        caught and surfaced as ``registry_total_supply: null`` rather than
+
+        failing the whole status endpoint.'
+      operationId: olas_scan_status_olas_scan_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /arc-scan/trigger:
+    post:
+      tags:
+      - Admin
+      summary: Trigger Arc Scan
+      description: 'Manually trigger the Arc nightly scan.
+
+
+        Protected by X-Internal-Key header. Returns immediately;
+
+        scan runs in the background.'
+      operationId: trigger_arc_scan_arc_scan_trigger_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /arc-scan/status:
+    get:
+      tags:
+      - Admin
+      summary: Arc Scan Status
+      description: 'Check if an Arc scan is currently running.
+
+
+        Protected by X-Internal-Key header.'
+      operationId: arc_scan_status_arc_scan_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /celo-scan/trigger:
+    post:
+      tags:
+      - Admin
+      summary: Trigger Celo Scan
+      description: 'Manually trigger the Celo nightly scan.
+
+
+        Protected by X-Internal-Key header. Returns immediately;
+
+        scan runs in the background.'
+      operationId: trigger_celo_scan_celo_scan_trigger_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /celo-scan/status:
+    get:
+      tags:
+      - Admin
+      summary: Celo Scan Status
+      description: 'Check if a Celo scan is currently running.
+
+
+        Protected by X-Internal-Key header.'
+      operationId: celo_scan_status_celo_scan_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /erc8004-scan/trigger:
+    post:
+      tags:
+      - Admin
+      summary: Trigger Erc8004 Scan
+      description: 'Manually trigger the ERC-8004 Base-mainnet nightly scan.
+
+
+        Protected by X-Internal-Key header. Returns immediately;
+
+        scan runs in the background.'
+      operationId: trigger_erc8004_scan_erc8004_scan_trigger_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /erc8004-scan/status:
+    get:
+      tags:
+      - Admin
+      summary: Erc8004 Scan Status
+      description: 'Check if an ERC-8004 Base-mainnet scan is currently running.
+
+
+        Protected by X-Internal-Key header.'
+      operationId: erc8004_scan_status_erc8004_scan_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /erc8183/status:
+    get:
+      tags:
+      - Admin
+      summary: Erc8183 Status
+      description: 'Check ERC-8183 evaluator worker status on Arc testnet.
+
+
+        Protected by X-Internal-Key header.'
+      operationId: erc8183_status_erc8183_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

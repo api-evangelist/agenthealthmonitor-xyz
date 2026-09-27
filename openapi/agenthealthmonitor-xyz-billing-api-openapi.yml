@@ -1,0 +1,276 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Billing API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Billing across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Billing
+  description: Stripe checkout webhooks and API key management for fiat-paid access.
+paths:
+  /stripe/webhook:
+    post:
+      tags:
+      - Billing
+      summary: Stripe Webhook
+      description: 'Unified Stripe webhook handler for all payment events.
+
+
+        Handles:
+
+        - checkout.session.completed — issues an API key (core) or creates
+
+        a Shield subscription (when metadata.product == "shield")
+
+        - customer.subscription.updated — updates Shield subscription status
+
+        - customer.subscription.deleted — cancels Shield subscription'
+      operationId: stripe_webhook_stripe_webhook_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /stripe/webhook/test:
+    post:
+      tags:
+      - Billing
+      summary: Stripe Webhook Test
+      description: 'Test endpoint: simulate a Stripe checkout.session.completed event.
+
+
+        Protected by X-Internal-Key header. For development/testing only.
+
+        Generates a real API key for the given email without requiring Stripe.'
+      operationId: stripe_webhook_test_stripe_webhook_test_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestWebhookRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /stripe/key/{session_id}:
+    get:
+      tags:
+      - Billing
+      summary: Retrieve Key
+      description: 'One-time retrieval of an API key after Stripe checkout.
+
+
+        Returns the plaintext key exactly once. Subsequent calls return
+
+        ``{"status": "consumed"}``. Expired (>24 h) or unknown session IDs
+
+        return the corresponding status.'
+      operationId: retrieve_key_stripe_key__session_id__get
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /checkout/success:
+    get:
+      tags:
+      - Billing
+      summary: Checkout Success Page
+      description: Post-checkout success page — retrieves and displays the API key once.
+      operationId: checkout_success_page_checkout_success_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /shield/subscribe:
+    post:
+      tags:
+      - Billing
+      summary: Shield Subscribe
+      description: 'Create a Stripe Checkout session for a Shield subscription tier.
+
+
+        Requires a valid X-API-Key header. The subscription will be linked to
+
+        the API key used for authentication.'
+      operationId: shield_subscribe_shield_subscribe_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShieldSubscribeRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/key/status:
+    get:
+      tags:
+      - Billing
+      summary: Api Key Status
+      description: 'Check the status of an API key.
+
+
+        Requires X-API-Key header. Returns tier, remaining calls, and key metadata.'
+      operationId: api_key_status_api_key_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /partners/{partner_id}/usage:
+    get:
+      tags:
+      - Billing
+      summary: Partner Usage
+      description: 'Usage report for a Shield reseller partner.
+
+
+        Protected by X-Internal-Key header. Returns call count, wholesale cost,
+
+        and billing period for the given partner_id.'
+      operationId: partner_usage_partners__partner_id__usage_get
+      parameters:
+      - name: partner_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Partner Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ShieldSubscribeRequest:
+      properties:
+        tier:
+          type: string
+          title: Tier
+          description: 'Shield tier: starter, pro, or enterprise'
+        success_url:
+          type: string
+          title: Success Url
+          description: URL to redirect after successful checkout
+          default: https://agenthealthmonitor.xyz/shield?subscribed=true
+        cancel_url:
+          type: string
+          title: Cancel Url
+          description: URL to redirect if checkout is cancelled
+          default: https://agenthealthmonitor.xyz/shield
+      type: object
+      required:
+      - tier
+      title: ShieldSubscribeRequest
+    TestWebhookRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+        tier:
+          type: string
+          title: Tier
+          default: starter
+        key_type:
+          type: string
+          title: Key Type
+          default: payg
+        calls:
+          type: integer
+          title: Calls
+          default: 100
+      type: object
+      required:
+      - email
+      title: TestWebhookRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

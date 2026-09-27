@@ -1,5 +1,5 @@
 aid: agenthealthmonitor-xyz
-name: Digital Intensity Ltd
+name: Agent Health Monitor
 description: 'Digital Intensity Ltd operates Agent Health Monitor (AHM, agenthealthmonitor.xyz), trust and health verification
   for autonomous agents on Base L2. Fourteen pay-per-call REST endpoints score any agent wallet: quick and premium risk scores
   (Nansen labels), health and wash diagnostics, the 0-100 Agent Health Score with A-F grades, tiered trust routing (instant_settle
@@ -9,6 +9,23 @@ description: 'Digital Intensity Ltd operates Agent Health Monitor (AHM, agenthea
   as OpenAPI 3.1.0, open source (MIT) on GitHub, with the ahm-shield Python SDK. AHM Verify scores delivered agent output
   at $0.50 per verdict. AHM also serves an ERC-8004 registration file, a legacy-path A2A agent card and a public roadmap.'
 url: https://raw.githubusercontent.com/api-evangelist/agenthealthmonitor-xyz/refs/heads/main/apis.yml
+deliveryModel:
+  model: unknown
+  license_evidence:
+    repo: moonshot-cyber/agent-health-monitor
+    spdx: none
+    stars: 0
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-unlicensed
+  generated: '2026-09-25'
+  method: derived
 image: https://agenthealthmonitor.xyz/static/ahm-logo.png
 x-type: company
 x-source: harvest:a2a-registry
@@ -36,7 +53,8 @@ tags:
 - Web3
 - Verifiable Credentials
 - Developer Tools
-- agent-native
+- Agent-Native
+- A2A
 tags_raw:
 - Agents
 - Agent trust
@@ -52,87 +70,343 @@ tags_raw:
 - Verifiable credentials
 - Developer tools
 - Agent-native
+- agent-native
+- A2A
 apis:
-- aid: agenthealthmonitor-xyz:agent-health-monitor-api
-  name: Agent Health Monitor API
-  description: REST API for agent-wallet trust and health on Base L2, published as OpenAPI 3.1.0 (v1.8.0) at https://agenthealthmonitor.xyz/openapi.json
-    — 74 paths / 76 operations across Scoring & Risk (/risk, /risk/premium, /counterparties, /network-map), Health & Hygiene
-    (/health, /wash, /ahs, /ahs/route, /ahs/route/policy, /ahs/batch, /report-card), Optimization (/optimize, /retry + free
-    preview), Protection (/agent/protect + free preview), Alerts (subscribe / configure / status / unsubscribe with Slack,
-    Discord or generic webhooks), plus discovery/info, partner coupon, Stripe billing and X-Internal-Key admin routes. Paid
-    routes answer HTTP 402 with an x402 v2 PAYMENT-REQUIRED challenge (USDC on eip155:8453) unless an X-API-Key is sent. The
-    spec declares no servers[] or securitySchemes; the base URL comes from the docs.
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-admin-api
+  name: Agent Health Monitor Admin API
+  description: >-
+    Internal admin endpoints protected by X-Internal-Key header. Security activity logs, trust registry,
+    and registry scan triggers.
   humanURL: https://docs.agenthealthmonitor.xyz/
-  image: https://agenthealthmonitor.xyz/static/ahm-logo.png
-  baseURL: https://agenthealthmonitor.xyz
+  baseURL: https://verify.agenthealthmonitor.xyz
   tags:
-  - Agents
-  - Risk Scoring
-  - Wallet Intelligence
-  - x402
-  - Webhook
-  tags_raw:
-  - Agents
-  - Risk Scoring
-  - Wallet Intelligence
-  - x402
-  - Webhooks
+  - Admin
   properties:
   - type: OpenAPI
-    url: openapi/agenthealthmonitor-xyz-openapi.yml
-  - type: OpenAPI
-    name: Agent Health Monitor OpenAPI 3.1 (provider-hosted)
-    url: https://agenthealthmonitor.xyz/openapi.json
+    url: openapi/agenthealthmonitor-xyz-admin-api-openapi.yml
   - type: Documentation
     url: https://docs.agenthealthmonitor.xyz/
   - type: APIReference
-    name: Swagger UI
     url: https://agenthealthmonitor.xyz/docs
   - type: GettingStarted
     url: https://docs.agenthealthmonitor.xyz/#getting-started
-  - type: Overlay
-    url: overlays/agenthealthmonitor-xyz-openapi-overlay.yaml
   - type: Webhooks
     url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
-  - type: MCPServer
-    url: mcp/agenthealthmonitor-xyz-mcp.yml
-  x-base-url-note: 'repair-api-bases.py flags this base as marketing-base-present because it equals the website root. That
-    is the deployed truth, not a placeholder: the README states "Base URL https://agenthealthmonitor.xyz", the docs quick-start
-    calls https://agenthealthmonitor.xyz/ahs/{address}, every resource in /.well-known/x402 is an apex URL, and live 402/200
-    responses were observed on apex paths on 2026-09-19. There is no api. host (api.agenthealthmonitor.xyz does not resolve).'
-- aid: agenthealthmonitor-xyz:ahm-verify-api
-  name: AHM Verify API
-  description: 'Post-transaction output-quality scoring: register a job specification (POST /v1/specs, free), submit an agent''s
-    delivered output for evaluation by a six-role adversarial Claude panel (POST /v1/outputs, $0.50 USDC per verdict via x402
-    — a live 402 was observed), and poll the verdict (GET /v1/verdicts/{verdict_id}) for ALLOW / HOLD / REJECT with confidence
-    and findings. Published as OpenAPI 3.1.0 (v0.1.0) at https://verify.agenthealthmonitor.xyz/openapi.json with Swagger UI
-    at /docs and a /health endpoint; separate from the AHS composite.'
-  humanURL: https://agenthealthmonitor.xyz/verify
-  image: https://agenthealthmonitor.xyz/static/ahm-logo.png
-  baseURL: https://verify.agenthealthmonitor.xyz
-  tags:
-  - Agents
-  - Evaluation
-  - x402
-  properties:
-  - type: OpenAPI
-    url: openapi/agenthealthmonitor-xyz-verify-openapi.yml
-  - type: OpenAPI
-    name: AHM Verify OpenAPI 3.1 (provider-hosted)
-    url: https://verify.agenthealthmonitor.xyz/openapi.json
   - type: Documentation
     url: https://docs.agenthealthmonitor.xyz/#gs-verify
   - type: APIReference
-    name: Swagger UI
     url: https://verify.agenthealthmonitor.xyz/docs
-  - type: Overlay
-    url: overlays/agenthealthmonitor-xyz-verify-openapi-overlay.yaml
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-alerts-api
+  name: Agent Health Monitor Alerts API
+  description: >-
+    Subscribe wallets to automated health monitoring with webhook alerts. Health checks run every 6 hours;
+    alerts fire when configurable thresholds are breached.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-alerts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-billing-api
+  name: Agent Health Monitor Billing API
+  description: Stripe checkout webhooks and API key management for fiat-paid access.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-billing-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-coupon-access-api
+  name: Agent Health Monitor Coupon Access API
+  description: >-
+    Partner coupon routes — access any paid endpoint for free with a valid coupon code. Rate-limited to
+    5 requests per IP per minute.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Coupon Access
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-coupon-access-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-discovery-info-api
+  name: Agent Health Monitor Discovery & Info API
+  description: >-
+    Service discovery, pricing info, ecosystem statistics, and x402/ERC-8004 well-known documents for
+    automated agent registration.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Discovery & Info
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-discovery-info-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-health-api
+  name: Agent Health Monitor Health API
+  description: The Health API from Agent Health Monitor — 1 operation(s) for health.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-health-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-health-hygiene-api
+  name: Agent Health Monitor Health & Hygiene API
+  description: >-
+    Wallet health diagnosis, hygiene scans, composite Agent Health Score (AHS), and visual report cards.
+    Core analysis endpoints from $0.50 to $2.00.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Health & Hygiene
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-health-hygiene-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-optimization-api
+  name: Agent Health Monitor Optimization API
+  description: >-
+    Gas optimization reports and failed-transaction retry bot. Returns per-transaction-type savings and
+    ready-to-sign EIP-1559 retry payloads.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Optimization
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-optimization-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-outputs-api
+  name: Agent Health Monitor Outputs API
+  description: The Outputs API from Agent Health Monitor — 1 operation(s) for outputs.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Outputs
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-outputs-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-protection-api
+  name: Agent Health Monitor Protection API
+  description: >-
+    Autonomous protection agent that triages risk and runs the appropriate combination of health, optimization,
+    and retry services automatically.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Protection
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-protection-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-scoring-risk-api
+  name: Agent Health Monitor Scoring & Risk API
+  description: >-
+    Risk scoring, counterparty analysis, and wallet network mapping. Fast pre-flight checks from $0.001
+    to deep Nansen-enriched analysis at $0.10.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Scoring & Risk
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-scoring-risk-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-specs-api
+  name: Agent Health Monitor Specs API
+  description: The Specs API from Agent Health Monitor — 1 operation(s) for specs.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Specs
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-specs-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-utility-api
+  name: Agent Health Monitor Utility API
+  description: Health checks and AI chat assistant.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Utility
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-utility-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
+- aid: agenthealthmonitor-xyz:agenthealthmonitor-xyz-verdicts-api
+  name: Agent Health Monitor Verdicts API
+  description: The Verdicts API from Agent Health Monitor — 1 operation(s) for verdicts.
+  humanURL: https://docs.agenthealthmonitor.xyz/
+  baseURL: https://verify.agenthealthmonitor.xyz
+  tags:
+  - Verdicts
+  properties:
+  - type: OpenAPI
+    url: openapi/agenthealthmonitor-xyz-verdicts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/
+  - type: APIReference
+    url: https://agenthealthmonitor.xyz/docs
+  - type: GettingStarted
+    url: https://docs.agenthealthmonitor.xyz/#getting-started
+  - type: Webhooks
+    url: asyncapi/agenthealthmonitor-xyz-alerts-webhooks.yml
+  - type: Documentation
+    url: https://docs.agenthealthmonitor.xyz/#gs-verify
+  - type: APIReference
+    url: https://verify.agenthealthmonitor.xyz/docs
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/agenthealthmonitor-xyz-openapi-overlay.yaml
+- type: Overlay
+  url: overlays/agenthealthmonitor-xyz-verify-openapi-overlay.yaml
 - type: AgenticAccess
   url: agentic-access/agenthealthmonitor-xyz-agentic-access.yml
 - type: Website
@@ -217,3 +491,11 @@ x-enrichment:
   status: enriched
   artifacts_added: 32
   pass: local-v3
+x-legal-name: Digital Intensity Ltd
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://agenthealthmonitor.xyz/.well-known/agent.json"
+  grade: "flavored"
+  protocol_version: "1.0"
+  control: 404

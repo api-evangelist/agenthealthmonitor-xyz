@@ -1,0 +1,130 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Specs API
+  version: 0.1.0
+  description: 'Operations tagged Specs across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-verify-openapi.json, agenthealthmonitor-xyz-verify-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://verify.agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://verify.agenthealthmonitor.xyz/openapi.json declares no servers[]; the host is the one that serves the spec and its Swagger UI (/docs) and is named as "Live at: verify.agenthealthmonitor.xyz" on docs.agenthealthmonitor.xyz. Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Specs
+paths:
+  /v1/specs:
+    post:
+      summary: Create Spec
+      description: Register a job specification. Returns spec_id and spec_hash.
+      operationId: create_spec_v1_specs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Specs
+components:
+  schemas:
+    SpecResponse:
+      properties:
+        spec_id:
+          type: string
+          title: Spec Id
+        spec_hash:
+          type: string
+          title: Spec Hash
+      type: object
+      required:
+      - spec_id
+      - spec_hash
+      title: SpecResponse
+    SpecRequest:
+      properties:
+        client_addr:
+          type: string
+          title: Client Addr
+          description: Wallet address of the client registering the spec
+        provider_addr:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Addr
+          description: Intended provider address, if known
+        spec_text:
+          type: string
+          minLength: 1
+          title: Spec Text
+          description: Task specification / job description
+        acceptance_criteria:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Acceptance Criteria
+          description: Pre-registered acceptance criteria
+        domain:
+          type: string
+          title: Domain
+          description: Evaluation domain key
+          default: default
+        erc8183_job_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Erc8183 Job Id
+          description: Optional on-chain job ID (hex)
+      type: object
+      required:
+      - client_addr
+      - spec_text
+      title: SpecRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-verify-openapi.json
+- agenthealthmonitor-xyz-verify-openapi.yml

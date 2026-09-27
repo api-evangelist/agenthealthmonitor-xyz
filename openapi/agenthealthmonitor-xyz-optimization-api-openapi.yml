@@ -1,0 +1,442 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Optimization API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Optimization across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Optimization
+  description: Gas optimization reports and failed-transaction retry bot. Returns per-transaction-type savings and ready-to-sign EIP-1559 retry payloads.
+paths:
+  /optimize/{address}:
+    get:
+      tags:
+      - Optimization
+      summary: Get Optimization Report
+      description: 'Analyze a Base wallet and return a gas optimization report.
+
+
+        Requires x402 payment ($5.00 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        - Groups transactions by type (contract + method)
+
+        - Calculates optimal gas limits per type
+
+        - Identifies wasted gas from failed transactions
+
+        - Estimates monthly savings with before/after comparison'
+      operationId: get_optimization_report_optimize__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /retry/preview/{address}:
+    get:
+      tags:
+      - Optimization
+      summary: Retry Preview
+      description: 'Free preview of retryable failed transactions.
+
+
+        Shows count of retryable failures and estimated savings
+
+        without returning the full optimized transactions.'
+      operationId: retry_preview_retry_preview__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetryPreviewResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /retry/{address}:
+    get:
+      tags:
+      - Optimization
+      summary: Get Retry Transactions
+      description: 'Analyze failed transactions and return optimized retry transactions.
+
+
+        Requires x402 payment ($10.00 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Non-custodial: returns ready-to-sign transaction objects.
+
+        The agent signs and submits the transactions themselves.
+
+
+        - Fetches failed transactions from Blockscout
+
+        - Classifies failure reasons: out_of_gas, reverted, nonce_conflict, slippage
+
+        - Filters to retryable failures only
+
+        - Builds optimized replacements with corrected gas parameters
+
+        - Returns ready-to-sign EIP-1559 transaction objects'
+      operationId: get_retry_transactions_retry__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    RetryTransactionItem:
+      properties:
+        original_tx_hash:
+          type: string
+          title: Original Tx Hash
+        failure_reason:
+          type: string
+          title: Failure Reason
+        optimized_transaction:
+          $ref: '#/components/schemas/OptimizedTransaction'
+        estimated_gas_cost_usd:
+          type: number
+          title: Estimated Gas Cost Usd
+        confidence:
+          type: string
+          title: Confidence
+      type: object
+      required:
+      - original_tx_hash
+      - failure_reason
+      - optimized_transaction
+      - estimated_gas_cost_usd
+      - confidence
+      title: RetryTransactionItem
+    RetryReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        failed_transactions_analyzed:
+          type: integer
+          title: Failed Transactions Analyzed
+        retryable_count:
+          type: integer
+          title: Retryable Count
+        retry_transactions:
+          items:
+            $ref: '#/components/schemas/RetryTransactionItem'
+          type: array
+          title: Retry Transactions
+        total_estimated_retry_cost_usd:
+          type: number
+          title: Total Estimated Retry Cost Usd
+        potential_value_recovered_usd:
+          type: number
+          title: Potential Value Recovered Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - failed_transactions_analyzed
+      - retryable_count
+      - retry_transactions
+      - total_estimated_retry_cost_usd
+      - potential_value_recovered_usd
+      - analyzed_at
+      title: RetryReport
+    RetryPreviewResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        failed_transactions_analyzed:
+          type: integer
+          title: Failed Transactions Analyzed
+        retryable_count:
+          type: integer
+          title: Retryable Count
+        total_estimated_retry_cost_usd:
+          type: number
+          title: Total Estimated Retry Cost Usd
+        potential_value_recovered_usd:
+          type: number
+          title: Potential Value Recovered Usd
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - status
+      - address
+      - failed_transactions_analyzed
+      - retryable_count
+      - total_estimated_retry_cost_usd
+      - potential_value_recovered_usd
+      - message
+      title: RetryPreviewResponse
+    RetryResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/RetryReport'
+      type: object
+      required:
+      - status
+      - report
+      title: RetryResponse
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    GasOptimizationReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        total_transactions_analyzed:
+          type: integer
+          title: Total Transactions Analyzed
+        current_monthly_gas_usd:
+          type: number
+          title: Current Monthly Gas Usd
+        optimized_monthly_gas_usd:
+          type: number
+          title: Optimized Monthly Gas Usd
+        estimated_monthly_savings_usd:
+          type: number
+          title: Estimated Monthly Savings Usd
+        total_wasted_gas_eth:
+          type: number
+          title: Total Wasted Gas Eth
+        total_wasted_gas_usd:
+          type: number
+          title: Total Wasted Gas Usd
+        tx_types:
+          items:
+            $ref: '#/components/schemas/TransactionTypeOptimization'
+          type: array
+          title: Tx Types
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - total_transactions_analyzed
+      - current_monthly_gas_usd
+      - optimized_monthly_gas_usd
+      - estimated_monthly_savings_usd
+      - total_wasted_gas_eth
+      - total_wasted_gas_usd
+      - tx_types
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: GasOptimizationReport
+    OptimizeResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/GasOptimizationReport'
+      type: object
+      required:
+      - status
+      - report
+      title: OptimizeResponse
+    TransactionTypeOptimization:
+      properties:
+        contract:
+          type: string
+          title: Contract
+        method_id:
+          type: string
+          title: Method Id
+        method_label:
+          type: string
+          title: Method Label
+        tx_count:
+          type: integer
+          title: Tx Count
+        failed_count:
+          type: integer
+          title: Failed Count
+        failure_rate_pct:
+          type: number
+          title: Failure Rate Pct
+        current_avg_gas_limit:
+          type: integer
+          title: Current Avg Gas Limit
+        current_p50_gas_used:
+          type: integer
+          title: Current P50 Gas Used
+        current_p95_gas_used:
+          type: integer
+          title: Current P95 Gas Used
+        optimal_gas_limit:
+          type: integer
+          title: Optimal Gas Limit
+        gas_limit_reduction_pct:
+          type: number
+          title: Gas Limit Reduction Pct
+        wasted_gas_eth:
+          type: number
+          title: Wasted Gas Eth
+        wasted_gas_usd:
+          type: number
+          title: Wasted Gas Usd
+      type: object
+      required:
+      - contract
+      - method_id
+      - method_label
+      - tx_count
+      - failed_count
+      - failure_rate_pct
+      - current_avg_gas_limit
+      - current_p50_gas_used
+      - current_p95_gas_used
+      - optimal_gas_limit
+      - gas_limit_reduction_pct
+      - wasted_gas_eth
+      - wasted_gas_usd
+      title: TransactionTypeOptimization
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

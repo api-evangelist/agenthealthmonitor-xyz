@@ -1,0 +1,523 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Coupon Access API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Coupon Access across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Coupon Access
+  description: Partner coupon routes — access any paid endpoint for free with a valid coupon code. Rate-limited to 5 requests per IP per minute.
+paths:
+  /coupon/validate/{code}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Validate Coupon
+      description: Check if a coupon code is valid. Rate-limited to 5 attempts per IP per minute.
+      operationId: validate_coupon_coupon_validate__code__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/risk/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Risk
+      description: Quick risk score via coupon — mirrors GET /risk/{address}.
+      operationId: coupon_risk_coupon_risk__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/health/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Health
+      description: Wallet health diagnosis via coupon — mirrors GET /health/{address}.
+      operationId: coupon_health_coupon_health__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/optimize/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Optimize
+      description: Gas optimization report via coupon — mirrors GET /optimize/{address}.
+      operationId: coupon_optimize_coupon_optimize__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/retry/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Retry
+      description: Retry bot via coupon — mirrors GET /retry/{address}.
+      operationId: coupon_retry_coupon_retry__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/protect/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Protect
+      description: Full protection agent via coupon — mirrors GET /agent/protect/{address}.
+      operationId: coupon_protect_coupon_protect__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/alerts/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Alerts
+      description: Alert subscription via coupon — mirrors GET /alerts/subscribe/{address}.
+      operationId: coupon_alerts_coupon_alerts__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/risk-premium/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Premium Risk
+      description: Premium risk score via coupon — mirrors GET /risk/premium/{address}.
+      operationId: coupon_premium_risk_coupon_risk_premium__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/counterparties/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Counterparties
+      description: Counterparty analysis via coupon — mirrors GET /counterparties/{address}.
+      operationId: coupon_counterparties_coupon_counterparties__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/network-map/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Network Map
+      description: Network map via coupon — mirrors GET /network-map/{address}.
+      operationId: coupon_network_map_coupon_network_map__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      - name: chain
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ethereum
+          title: Chain
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/wash/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Wash
+      description: Hygiene scan via coupon — mirrors POST /wash/{address}.
+      operationId: coupon_wash_coupon_wash__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/ahs/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Ahs
+      description: Agent Health Score via coupon — mirrors GET /ahs/{address}.
+      operationId: coupon_ahs_coupon_ahs__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /coupon/report-card/{code}/{address}:
+    get:
+      tags:
+      - Coupon Access
+      summary: Coupon Report Card
+      description: Visual report card via coupon — mirrors GET /report-card/{address}.
+      operationId: coupon_report_card_coupon_report_card__code___address__get
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Code
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

@@ -1,0 +1,635 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Protection API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Protection across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Protection
+  description: Autonomous protection agent that triages risk and runs the appropriate combination of health, optimization, and retry services automatically.
+paths:
+  /agent/protect/preview/{address}:
+    get:
+      tags:
+      - Protection
+      summary: Protection Preview
+      description: 'Free preview of protection agent analysis.
+
+
+        Shows wallet risk level, health score, and which services
+
+        would be run without executing the full analysis.'
+      operationId: protection_preview_agent_protect_preview__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectionPreviewResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /agent/protect/{address}:
+    get:
+      tags:
+      - Protection
+      summary: Get Protection Report
+      description: 'Autonomous protection agent — full wallet analysis and action plan.
+
+
+        Requires x402 payment ($25.00 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Triages wallet risk and runs the appropriate services:
+
+        - Score 90-100: Low risk — health report + recommend alerts
+
+        - Score 70-89: Medium risk — health + gas optimization
+
+        - Score 50-69: High risk — health + gas optimization + retry bot
+
+        - Score 0-49: Critical — all services, urgent flagging
+
+
+        Returns a unified report with all results and prioritized actions
+
+        ranked by potential value recovered.'
+      operationId: get_protection_report_agent_protect__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ProtectionActionItem:
+      properties:
+        priority:
+          type: integer
+          title: Priority
+        action:
+          type: string
+          title: Action
+        description:
+          type: string
+          title: Description
+        potential_value_usd:
+          type: number
+          title: Potential Value Usd
+          default: 0.0
+        potential_savings_monthly_usd:
+          type: number
+          title: Potential Savings Monthly Usd
+          default: 0.0
+      type: object
+      required:
+      - priority
+      - action
+      - description
+      title: ProtectionActionItem
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    RetryTransactionItem:
+      properties:
+        original_tx_hash:
+          type: string
+          title: Original Tx Hash
+        failure_reason:
+          type: string
+          title: Failure Reason
+        optimized_transaction:
+          $ref: '#/components/schemas/OptimizedTransaction'
+        estimated_gas_cost_usd:
+          type: number
+          title: Estimated Gas Cost Usd
+        confidence:
+          type: string
+          title: Confidence
+      type: object
+      required:
+      - original_tx_hash
+      - failure_reason
+      - optimized_transaction
+      - estimated_gas_cost_usd
+      - confidence
+      title: RetryTransactionItem
+    ProtectionReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        risk_level:
+          type: string
+          title: Risk Level
+        health_score:
+          type: number
+          title: Health Score
+        services_run:
+          items:
+            type: string
+          type: array
+          title: Services Run
+        summary:
+          $ref: '#/components/schemas/ProtectionSummaryModel'
+        health_report:
+          $ref: '#/components/schemas/HealthReport'
+        gas_optimization:
+          anyOf:
+          - $ref: '#/components/schemas/GasOptimizationReport'
+          - type: 'null'
+        retry_transactions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RetryTransactionItem'
+            type: array
+          - type: 'null'
+          title: Retry Transactions
+        recommended_actions:
+          items:
+            $ref: '#/components/schemas/ProtectionActionItem'
+          type: array
+          title: Recommended Actions
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - risk_level
+      - health_score
+      - services_run
+      - summary
+      - health_report
+      - recommended_actions
+      - analyzed_at
+      title: ProtectionReport
+    ProtectionResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/ProtectionReport'
+      type: object
+      required:
+      - status
+      - report
+      title: ProtectionResponse
+    HealthReport:
+      properties:
+        address:
+          type: string
+          title: Address
+          description: Wallet address analysed
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+        is_contract:
+          type: boolean
+          title: Is Contract
+          description: Whether the address is a smart contract
+          examples:
+          - false
+        health_score:
+          type: number
+          title: Health Score
+          description: Composite health score 0-100
+          examples:
+          - 74.5
+        optimization_priority:
+          type: string
+          title: Optimization Priority
+          description: 'Priority level: low, medium, high, critical'
+          examples:
+          - medium
+        total_transactions:
+          type: integer
+          title: Total Transactions
+          description: Total transactions in analysis window
+          examples:
+          - 1542
+        successful:
+          type: integer
+          title: Successful
+          description: Number of successful transactions
+          examples:
+          - 1480
+        failed:
+          type: integer
+          title: Failed
+          description: Number of failed transactions
+          examples:
+          - 62
+        success_rate_pct:
+          type: number
+          title: Success Rate Pct
+          description: Transaction success rate as percentage
+          examples:
+          - 95.98
+        total_gas_spent_eth:
+          type: number
+          title: Total Gas Spent Eth
+          description: Total gas spent in ETH
+          examples:
+          - 0.284
+        wasted_gas_eth:
+          type: number
+          title: Wasted Gas Eth
+          description: Gas wasted on failed transactions in ETH
+          examples:
+          - 0.019
+        estimated_monthly_waste_usd:
+          type: number
+          title: Estimated Monthly Waste Usd
+          description: Projected monthly USD waste at current rate
+          examples:
+          - 14.3
+        avg_gas_efficiency_pct:
+          type: number
+          title: Avg Gas Efficiency Pct
+          description: Average gas usage vs gas limit percentage
+          examples:
+          - 67.3
+        out_of_gas_count:
+          type: integer
+          title: Out Of Gas Count
+          description: Transactions that failed due to out-of-gas
+          examples:
+          - 3
+        reverted_count:
+          type: integer
+          title: Reverted Count
+          description: Transactions that reverted
+          examples:
+          - 59
+        nonce_gap_count:
+          type: integer
+          title: Nonce Gap Count
+          description: Detected nonce gaps
+          examples:
+          - 0
+        retry_count:
+          type: integer
+          title: Retry Count
+          description: Duplicate-nonce retry transactions detected
+          examples:
+          - 2
+        top_failure_type:
+          type: string
+          title: Top Failure Type
+          description: Most common failure reason
+          examples:
+          - execution reverted
+        first_seen:
+          type: string
+          title: First Seen
+          description: ISO 8601 timestamp of earliest transaction
+          examples:
+          - '2024-01-15T08:30:00Z'
+        last_seen:
+          type: string
+          title: Last Seen
+          description: ISO 8601 timestamp of most recent transaction
+          examples:
+          - '2025-04-05T14:22:00Z'
+        recommendations:
+          items:
+            $ref: '#/components/schemas/Recommendation'
+          type: array
+          title: Recommendations
+          description: Prioritised list of actionable recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+          description: ETH/USD price used for calculations
+          examples:
+          - 3245.5
+        analyzed_at:
+          type: string
+          title: Analyzed At
+          description: ISO 8601 timestamp of this analysis
+          examples:
+          - '2025-04-06T10:00:00Z'
+      type: object
+      required:
+      - address
+      - is_contract
+      - health_score
+      - optimization_priority
+      - total_transactions
+      - successful
+      - failed
+      - success_rate_pct
+      - total_gas_spent_eth
+      - wasted_gas_eth
+      - estimated_monthly_waste_usd
+      - avg_gas_efficiency_pct
+      - out_of_gas_count
+      - reverted_count
+      - nonce_gap_count
+      - retry_count
+      - top_failure_type
+      - first_seen
+      - last_seen
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: HealthReport
+    ProtectionSummaryModel:
+      properties:
+        total_issues_found:
+          type: integer
+          title: Total Issues Found
+        total_potential_savings_usd:
+          type: number
+          title: Total Potential Savings Usd
+        retry_transactions_ready:
+          type: integer
+          title: Retry Transactions Ready
+        estimated_retry_cost_usd:
+          type: number
+          title: Estimated Retry Cost Usd
+      type: object
+      required:
+      - total_issues_found
+      - total_potential_savings_usd
+      - retry_transactions_ready
+      - estimated_retry_cost_usd
+      title: ProtectionSummaryModel
+    ProtectionPreviewResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        risk_level:
+          type: string
+          title: Risk Level
+        health_score:
+          type: number
+          title: Health Score
+        services_recommended:
+          items:
+            type: string
+          type: array
+          title: Services Recommended
+        estimated_issues:
+          type: integer
+          title: Estimated Issues
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - status
+      - address
+      - risk_level
+      - health_score
+      - services_recommended
+      - estimated_issues
+      - message
+      title: ProtectionPreviewResponse
+    Recommendation:
+      properties:
+        category:
+          type: string
+          title: Category
+          description: Issue category (gas, nonce, failure, balance)
+          examples:
+          - gas
+        severity:
+          type: string
+          title: Severity
+          description: 'Severity level: critical, high, medium, or info'
+          examples:
+          - high
+        message:
+          type: string
+          title: Message
+          description: Actionable recommendation text
+          examples:
+          - Gas waste detected — 12% of gas spent on reverted transactions
+      type: object
+      required:
+      - category
+      - severity
+      - message
+      title: Recommendation
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    GasOptimizationReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        total_transactions_analyzed:
+          type: integer
+          title: Total Transactions Analyzed
+        current_monthly_gas_usd:
+          type: number
+          title: Current Monthly Gas Usd
+        optimized_monthly_gas_usd:
+          type: number
+          title: Optimized Monthly Gas Usd
+        estimated_monthly_savings_usd:
+          type: number
+          title: Estimated Monthly Savings Usd
+        total_wasted_gas_eth:
+          type: number
+          title: Total Wasted Gas Eth
+        total_wasted_gas_usd:
+          type: number
+          title: Total Wasted Gas Usd
+        tx_types:
+          items:
+            $ref: '#/components/schemas/TransactionTypeOptimization'
+          type: array
+          title: Tx Types
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - total_transactions_analyzed
+      - current_monthly_gas_usd
+      - optimized_monthly_gas_usd
+      - estimated_monthly_savings_usd
+      - total_wasted_gas_eth
+      - total_wasted_gas_usd
+      - tx_types
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: GasOptimizationReport
+    TransactionTypeOptimization:
+      properties:
+        contract:
+          type: string
+          title: Contract
+        method_id:
+          type: string
+          title: Method Id
+        method_label:
+          type: string
+          title: Method Label
+        tx_count:
+          type: integer
+          title: Tx Count
+        failed_count:
+          type: integer
+          title: Failed Count
+        failure_rate_pct:
+          type: number
+          title: Failure Rate Pct
+        current_avg_gas_limit:
+          type: integer
+          title: Current Avg Gas Limit
+        current_p50_gas_used:
+          type: integer
+          title: Current P50 Gas Used
+        current_p95_gas_used:
+          type: integer
+          title: Current P95 Gas Used
+        optimal_gas_limit:
+          type: integer
+          title: Optimal Gas Limit
+        gas_limit_reduction_pct:
+          type: number
+          title: Gas Limit Reduction Pct
+        wasted_gas_eth:
+          type: number
+          title: Wasted Gas Eth
+        wasted_gas_usd:
+          type: number
+          title: Wasted Gas Usd
+      type: object
+      required:
+      - contract
+      - method_id
+      - method_label
+      - tx_count
+      - failed_count
+      - failure_rate_pct
+      - current_avg_gas_limit
+      - current_p50_gas_used
+      - current_p95_gas_used
+      - optimal_gas_limit
+      - gas_limit_reduction_pct
+      - wasted_gas_eth
+      - wasted_gas_usd
+      title: TransactionTypeOptimization
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

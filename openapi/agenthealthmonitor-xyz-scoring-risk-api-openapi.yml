@@ -1,0 +1,537 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Scoring & Risk API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Scoring & Risk across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Scoring & Risk
+  description: Risk scoring, counterparty analysis, and wallet network mapping. Fast pre-flight checks from $0.001 to deep Nansen-enriched analysis at $0.10.
+paths:
+  /risk/premium/{address}:
+    get:
+      tags:
+      - Scoring & Risk
+      summary: Get Premium Risk Score
+      description: 'Premium risk score enriched with Nansen wallet intelligence, PnL data,
+
+        and operational health metrics (transaction failure rate analysis).
+
+
+        Requires x402 payment ($0.05 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Returns a 0-100 risk score plus Nansen smart money tags,
+
+        entity labels, behavioral signals, PnL summary, and operational
+
+        health (1hr/24hr revert rates, nonce gaps, volume anomalies).
+
+        PnL data adjusts the risk score: profitable wallets get up to -10,
+
+        unprofitable wallets get up to +10. Operational health adjusts:
+
+        degraded +5, critical +10.'
+      operationId: get_premium_risk_score_risk_premium__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PremiumRiskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /counterparties/{address}:
+    get:
+      tags:
+      - Scoring & Risk
+      summary: Get Counterparties
+      description: 'Know Your Counterparty — top wallets/contracts this address interacts with.
+
+
+        Requires x402 payment ($0.10 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Returns the top counterparties ranked by interaction count, enriched
+
+        with Nansen labels where available.'
+      operationId: get_counterparties_counterparties__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounterpartyResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /network-map/{address}:
+    get:
+      tags:
+      - Scoring & Risk
+      summary: Get Network Map
+      description: 'Wallet Network Map — related wallets linked by funding, deployment, or multisig.
+
+
+        Requires x402 payment ($0.10 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Returns wallets connected to this address via first-funder relationships,
+
+        contract deployments, and multisig co-signer links, enriched with Nansen labels.
+
+
+        Query params:
+
+        chain: blockchain to query (default: ethereum). Does NOT support "all".
+
+        Valid: arbitrum, avalanche, base, bnb, ethereum, polygon, solana, etc.'
+      operationId: get_network_map_network_map__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      - name: chain
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ethereum
+          title: Chain
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatedWalletsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /risk/{address}:
+    get:
+      tags:
+      - Scoring & Risk
+      summary: Get Risk Score
+      description: 'Quick risk score for agent pre-flight checks.
+
+
+        Requires x402 payment ($0.001 USDC on Base) OR valid X-API-Key / X-Internal-Key header.
+
+
+        Returns a 0-100 risk score derived from transaction failure rate,
+
+        wallet age, and contract interaction patterns. Designed for
+
+        high-volume, low-latency use.'
+      operationId: get_risk_score_risk__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Counterparty:
+      properties:
+        address:
+          type: string
+          title: Address
+        label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Label
+        interaction_count:
+          type: integer
+          title: Interaction Count
+          default: 0
+        volume_usd:
+          type: number
+          title: Volume Usd
+          default: 0.0
+        last_interaction:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Interaction
+      type: object
+      required:
+      - address
+      title: Counterparty
+    RelatedWallet:
+      properties:
+        address:
+          type: string
+          title: Address
+        label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Label
+        relation:
+          type: string
+          title: Relation
+        chain:
+          type: string
+          title: Chain
+        transaction_hash:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Transaction Hash
+        block_timestamp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Block Timestamp
+      type: object
+      required:
+      - address
+      - relation
+      - chain
+      title: RelatedWallet
+    CounterpartyResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        counterparties:
+          items:
+            $ref: '#/components/schemas/Counterparty'
+          type: array
+          title: Counterparties
+          default: []
+        total_counterparties:
+          type: integer
+          title: Total Counterparties
+          default: 0
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+          default: false
+      type: object
+      required:
+      - status
+      - address
+      title: CounterpartyResponse
+    PremiumRiskResponse:
+      properties:
+        risk_score:
+          type: integer
+          title: Risk Score
+        risk_level:
+          type: string
+          title: Risk Level
+        verdict:
+          type: string
+          title: Verdict
+        nansen_labels:
+          items:
+            $ref: '#/components/schemas/NansenLabel'
+          type: array
+          title: Nansen Labels
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+        pnl_summary:
+          anyOf:
+          - $ref: '#/components/schemas/PnlSummary'
+          - type: 'null'
+        pnl_available:
+          type: boolean
+          title: Pnl Available
+          default: false
+        operational_health:
+          anyOf:
+          - $ref: '#/components/schemas/OperationalHealth'
+          - type: 'null'
+      type: object
+      required:
+      - risk_score
+      - risk_level
+      - verdict
+      - nansen_labels
+      - nansen_available
+      title: PremiumRiskResponse
+    OperationalHealth:
+      properties:
+        tx_failure_rate_1hr:
+          type: number
+          title: Tx Failure Rate 1Hr
+          default: 0.0
+        tx_failure_rate_24hr:
+          type: number
+          title: Tx Failure Rate 24Hr
+          default: 0.0
+        total_txs_1hr:
+          type: integer
+          title: Total Txs 1Hr
+          default: 0
+        total_txs_24hr:
+          type: integer
+          title: Total Txs 24Hr
+          default: 0
+        nonce_gaps_detected:
+          type: boolean
+          title: Nonce Gaps Detected
+          default: false
+        volume_anomaly:
+          type: boolean
+          title: Volume Anomaly
+          default: false
+        health_status:
+          type: string
+          title: Health Status
+          default: unknown
+        health_detail:
+          type: string
+          title: Health Detail
+          default: ''
+      type: object
+      title: OperationalHealth
+    NansenLabel:
+      properties:
+        label:
+          type: string
+          title: Label
+          description: Nansen wallet label
+          examples:
+          - Smart Money
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: Label category
+          examples:
+          - behavioral
+        definition:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Definition
+          description: Human-readable label definition
+          examples:
+          - Wallet that consistently trades profitably
+      type: object
+      required:
+      - label
+      title: NansenLabel
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PnlTokenSummary:
+      properties:
+        token_symbol:
+          type: string
+          title: Token Symbol
+        chain:
+          type: string
+          title: Chain
+        realized_pnl:
+          type: number
+          title: Realized Pnl
+        realized_roi:
+          type: number
+          title: Realized Roi
+      type: object
+      required:
+      - token_symbol
+      - chain
+      - realized_pnl
+      - realized_roi
+      title: PnlTokenSummary
+    RiskResponse:
+      properties:
+        risk_score:
+          type: integer
+          title: Risk Score
+          description: Risk score from 0 (safe) to 100 (dangerous)
+          examples:
+          - 32
+        risk_level:
+          type: string
+          title: Risk Level
+          description: 'Risk classification: LOW, MEDIUM, HIGH, or CRITICAL'
+          examples:
+          - LOW
+        verdict:
+          type: string
+          title: Verdict
+          description: One-line human-readable risk assessment
+          examples:
+          - Low-risk wallet with normal transaction patterns
+      type: object
+      required:
+      - risk_score
+      - risk_level
+      - verdict
+      title: RiskResponse
+    RelatedWalletsResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        chain:
+          type: string
+          title: Chain
+        related_wallets:
+          items:
+            $ref: '#/components/schemas/RelatedWallet'
+          type: array
+          title: Related Wallets
+          default: []
+        total_related:
+          type: integer
+          title: Total Related
+          default: 0
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+          default: false
+      type: object
+      required:
+      - status
+      - address
+      - chain
+      title: RelatedWalletsResponse
+    PnlSummary:
+      properties:
+        realized_pnl_usd:
+          type: number
+          title: Realized Pnl Usd
+          default: 0.0
+        realized_pnl_percent:
+          type: number
+          title: Realized Pnl Percent
+          default: 0.0
+        win_rate:
+          type: number
+          title: Win Rate
+          default: 0.0
+        traded_token_count:
+          type: integer
+          title: Traded Token Count
+          default: 0
+        traded_times:
+          type: integer
+          title: Traded Times
+          default: 0
+        top_tokens:
+          items:
+            $ref: '#/components/schemas/PnlTokenSummary'
+          type: array
+          title: Top Tokens
+          default: []
+      type: object
+      title: PnlSummary
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

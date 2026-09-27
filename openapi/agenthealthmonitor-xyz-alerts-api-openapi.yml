@@ -1,0 +1,224 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Alerts API
+  version: 1.8.0
+  contact:
+    name: AHM Support
+    url: https://agenthealthmonitor.xyz/
+  license:
+    name: Proprietary
+  description: 'Operations tagged Alerts across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Alerts
+  description: Subscribe wallets to automated health monitoring with webhook alerts. Health checks run every 6 hours; alerts fire when configurable thresholds are breached.
+paths:
+  /alerts/subscribe/{address}:
+    get:
+      tags:
+      - Alerts
+      summary: Subscribe Alerts
+      description: 'Subscribe a wallet to automated health monitoring (30 days).
+
+
+        Requires x402 payment ($2.00 USDC on Base) OR valid X-API-Key header.
+
+
+        After payment, configure your webhook via POST /alerts/configure.
+
+        Health checks run every 6 hours and send alerts when thresholds are breached.'
+      operationId: subscribe_alerts_alerts_subscribe__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /alerts/configure:
+    post:
+      tags:
+      - Alerts
+      summary: Configure Alerts
+      description: 'Configure webhook and thresholds for an active alert subscription.
+
+
+        No payment required — must have an active subscription from GET /alerts/subscribe/{address}.'
+      operationId: configure_alerts_alerts_configure_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /alerts/status/{address}:
+    get:
+      tags:
+      - Alerts
+      summary: Alert Status
+      description: Check the status of an alert subscription.
+      operationId: alert_status_alerts_status__address__get
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /alerts/unsubscribe/{address}:
+    delete:
+      tags:
+      - Alerts
+      summary: Unsubscribe Alerts
+      description: Remove an alert subscription.
+      operationId: unsubscribe_alerts_alerts_unsubscribe__address__delete
+      parameters:
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+          title: Address
+        description: Ethereum wallet address (0x-prefixed, 40 hex chars)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ConfigureRequest:
+      properties:
+        address:
+          type: string
+          title: Address
+        webhook_url:
+          type: string
+          title: Webhook Url
+        webhook_type:
+          type: string
+          title: Webhook Type
+          default: generic
+        thresholds:
+          anyOf:
+          - $ref: '#/components/schemas/AlertThresholds'
+          - type: 'null'
+      type: object
+      required:
+      - address
+      - webhook_url
+      title: ConfigureRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    AlertThresholds:
+      properties:
+        health_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Health Score
+        failure_rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Failure Rate
+        waste_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Waste Usd
+      type: object
+      title: AlertThresholds
+x-refined-from:
+- agenthealthmonitor-xyz-openapi.json
+- agenthealthmonitor-xyz-openapi.yml

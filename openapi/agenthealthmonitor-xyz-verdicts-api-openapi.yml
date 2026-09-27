@@ -1,0 +1,189 @@
+openapi: 3.2.0
+info:
+  title: Agenthealthmonitor Xyz Verdicts API
+  version: 0.1.0
+  description: 'Operations tagged Verdicts across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-verify-openapi.json, agenthealthmonitor-xyz-verify-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://verify.agenthealthmonitor.xyz
+  description: Production
+  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://verify.agenthealthmonitor.xyz/openapi.json declares no servers[]; the host is the one that serves the spec and its Swagger UI (/docs) and is named as "Live at: verify.agenthealthmonitor.xyz" on docs.agenthealthmonitor.xyz. Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+tags:
+- name: Verdicts
+paths:
+  /v1/verdicts/{verdict_id}:
+    get:
+      summary: Get Verdict
+      description: Poll for verdict result. Returns status + full result when completed.
+      operationId: get_verdict_v1_verdicts__verdict_id__get
+      parameters:
+      - name: verdict_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Verdict Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerdictResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Verdicts
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    VerdictResponse:
+      properties:
+        verdict_id:
+          type: string
+          title: Verdict Id
+        status:
+          type: string
+          title: Status
+        final_verdict:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Final Verdict
+        final_score:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Final Score
+        confidence:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Confidence
+        mdi:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mdi
+        on_chain_action:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: On Chain Action
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        met_criteria:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Met Criteria
+        unmet_criteria:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Unmet Criteria
+        key_objections:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Key Objections
+        reasoning:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reasoning
+        strongest_dissent:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Strongest Dissent
+        generator_majority:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Generator Majority
+        critic_override_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Critic Override Applied
+        zero_history_adjustment_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Zero History Adjustment Applied
+        rejection_asymmetry_applied:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Rejection Asymmetry Applied
+        latency_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Latency Ms
+        evaluated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Evaluated At
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+      type: object
+      required:
+      - verdict_id
+      - status
+      title: VerdictResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+x-refined-from:
+- agenthealthmonitor-xyz-verify-openapi.json
+- agenthealthmonitor-xyz-verify-openapi.yml
