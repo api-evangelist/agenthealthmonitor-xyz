@@ -1,17 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Discovery & Info API
-  version: 1.8.0
+  title: Agent Health Monitor Discovery & Info API
+  description: Wallet intelligence API for autonomous agents on Base L2.
   contact:
     name: AHM Support
     url: https://agenthealthmonitor.xyz/
   license:
     name: Proprietary
-  description: 'Operations tagged Discovery & Info across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+  version: 1.8.0
 tags:
 - name: Discovery & Info
   description: Service discovery, pricing info, ecosystem statistics, and x402/ERC-8004 well-known documents for automated agent registration.
@@ -337,6 +333,41 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     AgentPublicProfile:
       properties:
         address:
@@ -411,41 +442,3 @@ components:
         This model is the security gate: only explicitly listed fields can be
 
         serialised.  Dimensional scores (d1, d2, …) are structurally excluded.'
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-x-refined-from:
-- agenthealthmonitor-xyz-openapi.json
-- agenthealthmonitor-xyz-openapi.yml

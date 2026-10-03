@@ -1,17 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Billing API
-  version: 1.8.0
+  title: Agent Health Monitor Billing API
+  description: Wallet intelligence API for autonomous agents on Base L2.
   contact:
     name: AHM Support
     url: https://agenthealthmonitor.xyz/
   license:
     name: Proprietary
-  description: 'Operations tagged Billing across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+  version: 1.8.0
 tags:
 - name: Billing
   description: Stripe checkout webhooks and API key management for fiat-paid access.
@@ -221,26 +217,6 @@ components:
       - msg
       - type
       title: ValidationError
-    ShieldSubscribeRequest:
-      properties:
-        tier:
-          type: string
-          title: Tier
-          description: 'Shield tier: starter, pro, or enterprise'
-        success_url:
-          type: string
-          title: Success Url
-          description: URL to redirect after successful checkout
-          default: https://agenthealthmonitor.xyz/shield?subscribed=true
-        cancel_url:
-          type: string
-          title: Cancel Url
-          description: URL to redirect if checkout is cancelled
-          default: https://agenthealthmonitor.xyz/shield
-      type: object
-      required:
-      - tier
-      title: ShieldSubscribeRequest
     TestWebhookRequest:
       properties:
         email:
@@ -262,6 +238,26 @@ components:
       required:
       - email
       title: TestWebhookRequest
+    ShieldSubscribeRequest:
+      properties:
+        tier:
+          type: string
+          title: Tier
+          description: 'Shield tier: starter, pro, or enterprise'
+        success_url:
+          type: string
+          title: Success Url
+          description: URL to redirect after successful checkout
+          default: https://agenthealthmonitor.xyz/shield?subscribed=true
+        cancel_url:
+          type: string
+          title: Cancel Url
+          description: URL to redirect if checkout is cancelled
+          default: https://agenthealthmonitor.xyz/shield
+      type: object
+      required:
+      - tier
+      title: ShieldSubscribeRequest
     HTTPValidationError:
       properties:
         detail:
@@ -271,6 +267,3 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
-x-refined-from:
-- agenthealthmonitor-xyz-openapi.json
-- agenthealthmonitor-xyz-openapi.yml

@@ -1,12 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Verdicts API
+  title: AHM Verify Verdicts API
+  description: Post-transaction output quality scoring via a six-role Claude adjudication panel (D4)
   version: 0.1.0
-  description: 'Operations tagged Verdicts across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-verify-openapi.json, agenthealthmonitor-xyz-verify-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://verify.agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://verify.agenthealthmonitor.xyz/openapi.json declares no servers[]; the host is the one that serves the spec and its Swagger UI (/docs) and is named as "Live at: verify.agenthealthmonitor.xyz" on docs.agenthealthmonitor.xyz. Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
 tags:
 - name: Verdicts
 paths:
@@ -65,6 +61,15 @@ components:
       - msg
       - type
       title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     VerdictResponse:
       properties:
         verdict_id:
@@ -175,15 +180,3 @@ components:
       - verdict_id
       - status
       title: VerdictResponse
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-x-refined-from:
-- agenthealthmonitor-xyz-verify-openapi.json
-- agenthealthmonitor-xyz-verify-openapi.yml

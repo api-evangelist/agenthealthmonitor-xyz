@@ -1,17 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Health & Hygiene API
-  version: 1.8.0
+  title: Agent Health Monitor Health & Hygiene API
+  description: Wallet intelligence API for autonomous agents on Base L2.
   contact:
     name: AHM Support
     url: https://agenthealthmonitor.xyz/
   license:
     name: Proprietary
-  description: 'Operations tagged Health & Hygiene across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+  version: 1.8.0
 tags:
 - name: Health & Hygiene
   description: Wallet health diagnosis, hygiene scans, composite Agent Health Score (AHS), and visual report cards. Core analysis endpoints from $0.50 to $2.00.
@@ -337,48 +333,32 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HealthResponse:
+    ValidationError:
       properties:
-        status:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
           type: string
-          title: Status
-          description: Response status
-          examples:
-          - ok
-        report:
-          $ref: '#/components/schemas/HealthReport'
-          description: Full health analysis report
-        nansen_labels:
-          items:
-            $ref: '#/components/schemas/NansenLabel'
-          type: array
-          title: Nansen Labels
-          description: Nansen wallet intelligence labels, if available
-          default: []
-        nansen_available:
-          type: boolean
-          title: Nansen Available
-          description: Whether Nansen enrichment was successful
-          default: false
-        token_balances:
-          items:
-            $ref: '#/components/schemas/TokenBalance'
-          type: array
-          title: Token Balances
-          description: Token balances across chains
-          default: []
-        total_portfolio_usd:
-          type: number
-          title: Total Portfolio Usd
-          description: Total portfolio value in USD
-          default: 0.0
-          examples:
-          - 4820.5
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
       required:
-      - status
-      - report
-      title: HealthResponse
+      - loc
+      - msg
+      - type
+      title: ValidationError
     RoutingPolicyRequest:
       properties:
         instant_grades:
@@ -442,61 +422,144 @@ components:
       - escrow_grades
       - reject_grades
       title: RoutingPolicyRequest
-    ReportCardDimension:
+    Recommendation:
       properties:
-        dimension:
+        category:
           type: string
-          title: Dimension
-          description: Dimension name (D1 Wallet Hygiene, D2 Behavioural, D3 Infrastructure)
+          title: Category
+          description: Issue category (gas, nonce, failure, balance)
           examples:
-          - D1 Wallet Hygiene
-        score:
+          - gas
+        severity:
+          type: string
+          title: Severity
+          description: 'Severity level: critical, high, medium, or info'
+          examples:
+          - high
+        message:
+          type: string
+          title: Message
+          description: Actionable recommendation text
+          examples:
+          - Gas waste detected — 12% of gas spent on reverted transactions
+      type: object
+      required:
+      - category
+      - severity
+      - message
+      title: Recommendation
+    WashIssue:
+      properties:
+        category:
+          type: string
+          title: Category
+          description: 'Issue category: dust, spam, gas, failed_tx, or nonce'
+          examples:
+          - dust
+        severity:
+          type: string
+          title: Severity
+          description: 'Issue severity: low, medium, or high'
+          examples:
+          - medium
+        description:
+          type: string
+          title: Description
+          description: Human-readable description of the issue
+          examples:
+          - 14 dust tokens worth < $0.01 each cluttering wallet
+        action:
+          type: string
+          title: Action
+          description: Recommended cleanup action
+          examples:
+          - Consolidate or discard dust tokens to reduce clutter
+        estimated_savings:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Estimated Savings
+          description: Potential savings from fixing this issue
+          examples:
+          - $0.42/month in gas
+      type: object
+      required:
+      - category
+      - severity
+      - description
+      - action
+      title: WashIssue
+    EcosystemComparison:
+      properties:
+        average_ahs:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Ahs
+          description: Ecosystem-wide average AHS score
+          examples:
+          - 58.3
+        percentile_rank:
+          type: integer
+          title: Percentile Rank
+          description: This wallet's percentile rank in the ecosystem (0-100)
+          examples:
+          - 72
+        grade_distribution:
+          additionalProperties: true
+          type: object
+          title: Grade Distribution
+          description: Grade distribution across all scored agents
+          examples:
+          - A: 8
+            B: 22
+            C: 45
+            D: 18
+            F: 7
+        total_agents_scored:
+          type: integer
+          title: Total Agents Scored
+          description: Total agents in the comparison pool
+          examples:
+          - 1247
+      type: object
+      required:
+      - percentile_rank
+      - grade_distribution
+      - total_agents_scored
+      title: EcosystemComparison
+    AHSShadowSignals:
+      properties:
+        session_continuity_score:
           anyOf:
           - type: integer
           - type: 'null'
-          title: Score
-          description: Dimension score 0-100
-          examples:
-          - 84
-        weight:
+          title: Session Continuity Score
+        abrupt_sessions:
+          type: integer
+          title: Abrupt Sessions
+          default: 0
+        budget_exhaustion_count:
+          type: integer
+          title: Budget Exhaustion Count
+          default: 0
+        total_sessions:
+          type: integer
+          title: Total Sessions
+          default: 0
+        avg_session_length:
           type: number
-          title: Weight
-          description: Weight of this dimension in the composite score
-          examples:
-          - 0.5
+          title: Avg Session Length
+          default: 0.0
+        shadow_patterns:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Shadow Patterns
+          default: []
       type: object
-      required:
-      - dimension
-      - weight
-      title: ReportCardDimension
-    NansenLabel:
-      properties:
-        label:
-          type: string
-          title: Label
-          description: Nansen wallet label
-          examples:
-          - Smart Money
-        category:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Category
-          description: Label category
-          examples:
-          - behavioral
-        definition:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Definition
-          description: Human-readable label definition
-          examples:
-          - Wallet that consistently trades profitably
-      type: object
-      required:
-      - label
-      title: NansenLabel
+      title: AHSShadowSignals
     AHSCrossDimensionalPattern:
       properties:
         name:
@@ -708,60 +771,48 @@ components:
       - eth_price_usd
       - analyzed_at
       title: HealthReport
-    AHSDimensionScore:
+    HealthResponse:
       properties:
-        dimension:
+        status:
           type: string
-          title: Dimension
-        score:
-          type: integer
-          title: Score
-        weight:
-          type: number
-          title: Weight
-        contributing_factors:
-          items: {}
+          title: Status
+          description: Response status
+          examples:
+          - ok
+        report:
+          $ref: '#/components/schemas/HealthReport'
+          description: Full health analysis report
+        nansen_labels:
+          items:
+            $ref: '#/components/schemas/NansenLabel'
           type: array
-          title: Contributing Factors
+          title: Nansen Labels
+          description: Nansen wallet intelligence labels, if available
+          default: []
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+          description: Whether Nansen enrichment was successful
+          default: false
+        token_balances:
+          items:
+            $ref: '#/components/schemas/TokenBalance'
+          type: array
+          title: Token Balances
+          description: Token balances across chains
+          default: []
+        total_portfolio_usd:
+          type: number
+          title: Total Portfolio Usd
+          description: Total portfolio value in USD
+          default: 0.0
+          examples:
+          - 4820.5
       type: object
       required:
-      - dimension
-      - score
-      - weight
-      - contributing_factors
-      title: AHSDimensionScore
-    AHSShadowSignals:
-      properties:
-        session_continuity_score:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Session Continuity Score
-        abrupt_sessions:
-          type: integer
-          title: Abrupt Sessions
-          default: 0
-        budget_exhaustion_count:
-          type: integer
-          title: Budget Exhaustion Count
-          default: 0
-        total_sessions:
-          type: integer
-          title: Total Sessions
-          default: 0
-        avg_session_length:
-          type: number
-          title: Avg Session Length
-          default: 0.0
-        shadow_patterns:
-          items:
-            additionalProperties: true
-            type: object
-          type: array
-          title: Shadow Patterns
-          default: []
-      type: object
-      title: AHSShadowSignals
+      - status
+      - report
+      title: HealthResponse
     RoutingPolicyResponse:
       properties:
         instant_grades:
@@ -813,126 +864,34 @@ components:
       - allowlist_count
       - updated_at
       title: RoutingPolicyResponse
-    ReportCardReport:
+    NansenLabel:
       properties:
-        address:
+        label:
           type: string
-          title: Address
-          description: Wallet address scored
+          title: Label
+          description: Nansen wallet label
           examples:
-          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
-        agent_health_score:
-          type: integer
-          title: Agent Health Score
-          description: Composite AHS score 0-100
-          examples:
-          - 67
-        grade:
-          type: string
-          title: Grade
-          description: Letter grade A-F
-          examples:
-          - C
-        confidence:
-          type: string
-          title: Confidence
-          description: 'Score confidence: high, medium, or low'
-          examples:
-          - high
-        mode:
-          type: string
-          title: Mode
-          description: 'Scoring mode: 2D or 3D'
-          examples:
-          - 2D
-        dimensions:
-          items:
-            $ref: '#/components/schemas/ReportCardDimension'
-          type: array
-          title: Dimensions
-          description: Per-dimension score breakdown
-        patterns_detected:
-          items:
-            $ref: '#/components/schemas/AHSCrossDimensionalPattern'
-          type: array
-          title: Patterns Detected
-          description: Cross-dimensional anomaly patterns detected
-        recommendations:
-          items:
-            type: string
-          type: array
-          title: Recommendations
-          description: Prioritised improvement actions
-          examples:
-          - - Reduce revert rate below 5%
-        ecosystem_comparison:
-          $ref: '#/components/schemas/EcosystemComparison'
-          description: How this wallet compares to the ecosystem
-        image_url:
-          type: string
-          title: Image Url
-          description: URL to the generated report card PNG image
-          examples:
-          - https://agenthealthmonitor.xyz/static/report-cards/0xde0b...7bae.png
-        share_url:
-          type: string
-          title: Share Url
-          description: Shareable URL for this report card
-          examples:
-          - https://agenthealthmonitor.xyz/report-card/0xde0b...7bae
-      type: object
-      required:
-      - address
-      - agent_health_score
-      - grade
-      - confidence
-      - mode
-      - dimensions
-      - patterns_detected
-      - recommendations
-      - ecosystem_comparison
-      - image_url
-      - share_url
-      title: ReportCardReport
-    EcosystemComparison:
-      properties:
-        average_ahs:
+          - Smart Money
+        category:
           anyOf:
-          - type: number
+          - type: string
           - type: 'null'
-          title: Average Ahs
-          description: Ecosystem-wide average AHS score
+          title: Category
+          description: Label category
           examples:
-          - 58.3
-        percentile_rank:
-          type: integer
-          title: Percentile Rank
-          description: This wallet's percentile rank in the ecosystem (0-100)
+          - behavioral
+        definition:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Definition
+          description: Human-readable label definition
           examples:
-          - 72
-        grade_distribution:
-          additionalProperties: true
-          type: object
-          title: Grade Distribution
-          description: Grade distribution across all scored agents
-          examples:
-          - A: 8
-            B: 22
-            C: 45
-            D: 18
-            F: 7
-        total_agents_scored:
-          type: integer
-          title: Total Agents Scored
-          description: Total agents in the comparison pool
-          examples:
-          - 1247
+          - Wallet that consistently trades profitably
       type: object
       required:
-      - percentile_rank
-      - grade_distribution
-      - total_agents_scored
-      title: EcosystemComparison
+      - label
+      title: NansenLabel
     AHSBatchResultItem:
       properties:
         address:
@@ -970,309 +929,6 @@ components:
       - verdict
       - routing_recommendation
       title: AHSBatchResultItem
-    AHSBatchResponse:
-      properties:
-        results:
-          items:
-            $ref: '#/components/schemas/AHSBatchResultItem'
-          type: array
-          title: Results
-        page:
-          type: integer
-          title: Page
-        page_size:
-          type: integer
-          title: Page Size
-        total_addresses:
-          type: integer
-          title: Total Addresses
-        total_scored:
-          type: integer
-          title: Total Scored
-        credits_used:
-          type: integer
-          title: Credits Used
-        credits_remaining:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Credits Remaining
-        errors:
-          items:
-            type: string
-          type: array
-          title: Errors
-      type: object
-      required:
-      - results
-      - page
-      - page_size
-      - total_addresses
-      - total_scored
-      - credits_used
-      - errors
-      title: AHSBatchResponse
-    WashResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-          description: Response status
-          examples:
-          - ok
-        report:
-          $ref: '#/components/schemas/WashReport'
-          description: Full hygiene scan report
-      type: object
-      required:
-      - status
-      - report
-      title: WashResponse
-    WashIssue:
-      properties:
-        category:
-          type: string
-          title: Category
-          description: 'Issue category: dust, spam, gas, failed_tx, or nonce'
-          examples:
-          - dust
-        severity:
-          type: string
-          title: Severity
-          description: 'Issue severity: low, medium, or high'
-          examples:
-          - medium
-        description:
-          type: string
-          title: Description
-          description: Human-readable description of the issue
-          examples:
-          - 14 dust tokens worth < $0.01 each cluttering wallet
-        action:
-          type: string
-          title: Action
-          description: Recommended cleanup action
-          examples:
-          - Consolidate or discard dust tokens to reduce clutter
-        estimated_savings:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Estimated Savings
-          description: Potential savings from fixing this issue
-          examples:
-          - $0.42/month in gas
-      type: object
-      required:
-      - category
-      - severity
-      - description
-      - action
-      title: WashIssue
-    Recommendation:
-      properties:
-        category:
-          type: string
-          title: Category
-          description: Issue category (gas, nonce, failure, balance)
-          examples:
-          - gas
-        severity:
-          type: string
-          title: Severity
-          description: 'Severity level: critical, high, medium, or info'
-          examples:
-          - high
-        message:
-          type: string
-          title: Message
-          description: Actionable recommendation text
-          examples:
-          - Gas waste detected — 12% of gas spent on reverted transactions
-      type: object
-      required:
-      - category
-      - severity
-      - message
-      title: Recommendation
-    AHSReport:
-      properties:
-        address:
-          type: string
-          title: Address
-          description: Wallet address scored
-          examples:
-          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
-        agent_health_score:
-          type: integer
-          title: Agent Health Score
-          description: Composite AHS score 0-100
-          examples:
-          - 67
-        grade:
-          type: string
-          title: Grade
-          description: Letter grade A-F
-          examples:
-          - C
-        confidence:
-          type: string
-          title: Confidence
-          description: 'Score confidence level: high, medium, or low'
-          examples:
-          - high
-        mode:
-          type: string
-          title: Mode
-          description: 'Scoring mode: 2D (wallet + behavioural) or 3D (+ infrastructure)'
-          examples:
-          - 2D
-        dimensions:
-          items:
-            $ref: '#/components/schemas/AHSDimensionScore'
-          type: array
-          title: Dimensions
-          description: Per-dimension score breakdown
-        patterns_detected:
-          items:
-            $ref: '#/components/schemas/AHSCrossDimensionalPattern'
-          type: array
-          title: Patterns Detected
-          description: Cross-dimensional anomaly patterns detected
-        trend:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Trend
-          description: 'Score trend vs previous scan: improving, stable, or declining'
-          examples:
-          - stable
-        recommendations:
-          items:
-            type: string
-          type: array
-          title: Recommendations
-          description: Prioritised improvement recommendations
-          examples:
-          - - Reduce revert rate below 5% to improve D1 score
-            - Investigate Zombie Agent pattern
-        ahs_token:
-          type: string
-          title: Ahs Token
-          description: JWT token for temporal trend tracking across scans
-          examples:
-          - eyJhbGciOiJIUzI1NiIs...
-        model_version:
-          type: string
-          title: Model Version
-          description: AHS scoring model version
-          examples:
-          - 2.1.0
-        scan_timestamp:
-          type: string
-          title: Scan Timestamp
-          description: ISO 8601 timestamp of this scan
-          examples:
-          - '2025-04-06T10:00:00Z'
-        next_scan_recommended:
-          type: string
-          title: Next Scan Recommended
-          description: Recommended next scan date
-          examples:
-          - '2025-04-13T10:00:00Z'
-        shadow_signals:
-          anyOf:
-          - $ref: '#/components/schemas/AHSShadowSignals'
-          - type: 'null'
-          description: Shadow signal analysis (session continuity, budget exhaustion)
-        routing_recommendation:
-          type: string
-          title: Routing Recommendation
-          description: 'Trust-based routing signal: instant_settle, escrow, or reject'
-          examples:
-          - escrow
-      type: object
-      required:
-      - address
-      - agent_health_score
-      - grade
-      - confidence
-      - mode
-      - dimensions
-      - patterns_detected
-      - recommendations
-      - ahs_token
-      - model_version
-      - scan_timestamp
-      - next_scan_recommended
-      - routing_recommendation
-      title: AHSReport
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    TokenBalance:
-      properties:
-        chain:
-          type: string
-          title: Chain
-          description: Chain identifier
-          examples:
-          - base
-        symbol:
-          type: string
-          title: Symbol
-          description: Token ticker symbol
-          examples:
-          - USDC
-        name:
-          type: string
-          title: Name
-          description: Full token name
-          examples:
-          - USD Coin
-        amount:
-          type: number
-          title: Amount
-          description: Token balance amount
-          examples:
-          - 1250.75
-        usd_value:
-          type: number
-          title: Usd Value
-          description: USD value of the balance
-          examples:
-          - 1250.75
-      type: object
-      required:
-      - chain
-      - symbol
-      - name
-      - amount
-      - usd_value
-      title: TokenBalance
     TrustRouteResponse:
       properties:
         address:
@@ -1337,6 +993,55 @@ components:
       - scored_at
       - stale
       title: TrustRouteResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    TokenBalance:
+      properties:
+        chain:
+          type: string
+          title: Chain
+          description: Chain identifier
+          examples:
+          - base
+        symbol:
+          type: string
+          title: Symbol
+          description: Token ticker symbol
+          examples:
+          - USDC
+        name:
+          type: string
+          title: Name
+          description: Full token name
+          examples:
+          - USD Coin
+        amount:
+          type: number
+          title: Amount
+          description: Token balance amount
+          examples:
+          - 1250.75
+        usd_value:
+          type: number
+          title: Usd Value
+          description: USD value of the balance
+          examples:
+          - 1250.75
+      type: object
+      required:
+      - chain
+      - symbol
+      - name
+      - amount
+      - usd_value
+      title: TokenBalance
     WashReport:
       properties:
         address:
@@ -1484,7 +1189,88 @@ components:
       - scan_timestamp
       - next_wash_recommended
       title: WashReport
-    AHSResponse:
+    ReportCardReport:
+      properties:
+        address:
+          type: string
+          title: Address
+          description: Wallet address scored
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+        agent_health_score:
+          type: integer
+          title: Agent Health Score
+          description: Composite AHS score 0-100
+          examples:
+          - 67
+        grade:
+          type: string
+          title: Grade
+          description: Letter grade A-F
+          examples:
+          - C
+        confidence:
+          type: string
+          title: Confidence
+          description: 'Score confidence: high, medium, or low'
+          examples:
+          - high
+        mode:
+          type: string
+          title: Mode
+          description: 'Scoring mode: 2D or 3D'
+          examples:
+          - 2D
+        dimensions:
+          items:
+            $ref: '#/components/schemas/ReportCardDimension'
+          type: array
+          title: Dimensions
+          description: Per-dimension score breakdown
+        patterns_detected:
+          items:
+            $ref: '#/components/schemas/AHSCrossDimensionalPattern'
+          type: array
+          title: Patterns Detected
+          description: Cross-dimensional anomaly patterns detected
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+          description: Prioritised improvement actions
+          examples:
+          - - Reduce revert rate below 5%
+        ecosystem_comparison:
+          $ref: '#/components/schemas/EcosystemComparison'
+          description: How this wallet compares to the ecosystem
+        image_url:
+          type: string
+          title: Image Url
+          description: URL to the generated report card PNG image
+          examples:
+          - https://agenthealthmonitor.xyz/static/report-cards/0xde0b...7bae.png
+        share_url:
+          type: string
+          title: Share Url
+          description: Shareable URL for this report card
+          examples:
+          - https://agenthealthmonitor.xyz/report-card/0xde0b...7bae
+      type: object
+      required:
+      - address
+      - agent_health_score
+      - grade
+      - confidence
+      - mode
+      - dimensions
+      - patterns_detected
+      - recommendations
+      - ecosystem_comparison
+      - image_url
+      - share_url
+      title: ReportCardReport
+    WashResponse:
       properties:
         status:
           type: string
@@ -1493,22 +1279,189 @@ components:
           examples:
           - ok
         report:
-          $ref: '#/components/schemas/AHSReport'
-          description: Full Agent Health Score report
+          $ref: '#/components/schemas/WashReport'
+          description: Full hygiene scan report
       type: object
       required:
       - status
       - report
-      title: AHSResponse
-    HTTPValidationError:
+      title: WashResponse
+    AHSReport:
       properties:
-        detail:
+        address:
+          type: string
+          title: Address
+          description: Wallet address scored
+          examples:
+          - '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae'
+        agent_health_score:
+          type: integer
+          title: Agent Health Score
+          description: Composite AHS score 0-100
+          examples:
+          - 67
+        grade:
+          type: string
+          title: Grade
+          description: Letter grade A-F
+          examples:
+          - C
+        confidence:
+          type: string
+          title: Confidence
+          description: 'Score confidence level: high, medium, or low'
+          examples:
+          - high
+        mode:
+          type: string
+          title: Mode
+          description: 'Scoring mode: 2D (wallet + behavioural) or 3D (+ infrastructure)'
+          examples:
+          - 2D
+        dimensions:
           items:
-            $ref: '#/components/schemas/ValidationError'
+            $ref: '#/components/schemas/AHSDimensionScore'
           type: array
-          title: Detail
+          title: Dimensions
+          description: Per-dimension score breakdown
+        patterns_detected:
+          items:
+            $ref: '#/components/schemas/AHSCrossDimensionalPattern'
+          type: array
+          title: Patterns Detected
+          description: Cross-dimensional anomaly patterns detected
+        trend:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Trend
+          description: 'Score trend vs previous scan: improving, stable, or declining'
+          examples:
+          - stable
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+          description: Prioritised improvement recommendations
+          examples:
+          - - Reduce revert rate below 5% to improve D1 score
+            - Investigate Zombie Agent pattern
+        ahs_token:
+          type: string
+          title: Ahs Token
+          description: JWT token for temporal trend tracking across scans
+          examples:
+          - eyJhbGciOiJIUzI1NiIs...
+        model_version:
+          type: string
+          title: Model Version
+          description: AHS scoring model version
+          examples:
+          - 2.1.0
+        scan_timestamp:
+          type: string
+          title: Scan Timestamp
+          description: ISO 8601 timestamp of this scan
+          examples:
+          - '2025-04-06T10:00:00Z'
+        next_scan_recommended:
+          type: string
+          title: Next Scan Recommended
+          description: Recommended next scan date
+          examples:
+          - '2025-04-13T10:00:00Z'
+        shadow_signals:
+          anyOf:
+          - $ref: '#/components/schemas/AHSShadowSignals'
+          - type: 'null'
+          description: Shadow signal analysis (session continuity, budget exhaustion)
+        routing_recommendation:
+          type: string
+          title: Routing Recommendation
+          description: 'Trust-based routing signal: instant_settle, escrow, or reject'
+          examples:
+          - escrow
       type: object
-      title: HTTPValidationError
+      required:
+      - address
+      - agent_health_score
+      - grade
+      - confidence
+      - mode
+      - dimensions
+      - patterns_detected
+      - recommendations
+      - ahs_token
+      - model_version
+      - scan_timestamp
+      - next_scan_recommended
+      - routing_recommendation
+      title: AHSReport
+    AHSDimensionScore:
+      properties:
+        dimension:
+          type: string
+          title: Dimension
+        score:
+          type: integer
+          title: Score
+        weight:
+          type: number
+          title: Weight
+        contributing_factors:
+          items: {}
+          type: array
+          title: Contributing Factors
+      type: object
+      required:
+      - dimension
+      - score
+      - weight
+      - contributing_factors
+      title: AHSDimensionScore
+    AHSBatchResponse:
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/AHSBatchResultItem'
+          type: array
+          title: Results
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+        total_addresses:
+          type: integer
+          title: Total Addresses
+        total_scored:
+          type: integer
+          title: Total Scored
+        credits_used:
+          type: integer
+          title: Credits Used
+        credits_remaining:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Credits Remaining
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+      type: object
+      required:
+      - results
+      - page
+      - page_size
+      - total_addresses
+      - total_scored
+      - credits_used
+      - errors
+      title: AHSBatchResponse
     ReportCardResponse:
       properties:
         status:
@@ -1525,6 +1478,46 @@ components:
       - status
       - report
       title: ReportCardResponse
-x-refined-from:
-- agenthealthmonitor-xyz-openapi.json
-- agenthealthmonitor-xyz-openapi.yml
+    AHSResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          description: Response status
+          examples:
+          - ok
+        report:
+          $ref: '#/components/schemas/AHSReport'
+          description: Full Agent Health Score report
+      type: object
+      required:
+      - status
+      - report
+      title: AHSResponse
+    ReportCardDimension:
+      properties:
+        dimension:
+          type: string
+          title: Dimension
+          description: Dimension name (D1 Wallet Hygiene, D2 Behavioural, D3 Infrastructure)
+          examples:
+          - D1 Wallet Hygiene
+        score:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Score
+          description: Dimension score 0-100
+          examples:
+          - 84
+        weight:
+          type: number
+          title: Weight
+          description: Weight of this dimension in the composite score
+          examples:
+          - 0.5
+      type: object
+      required:
+      - dimension
+      - weight
+      title: ReportCardDimension

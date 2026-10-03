@@ -1,17 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Optimization API
-  version: 1.8.0
+  title: Agent Health Monitor Optimization API
+  description: Wallet intelligence API for autonomous agents on Base L2.
   contact:
     name: AHM Support
     url: https://agenthealthmonitor.xyz/
   license:
     name: Proprietary
-  description: 'Operations tagged Optimization across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+  version: 1.8.0
 tags:
 - name: Optimization
   description: Gas optimization reports and failed-transaction retry bot. Returns per-transaction-type savings and ready-to-sign EIP-1559 retry payloads.
@@ -197,124 +193,6 @@ components:
       - estimated_gas_cost_usd
       - confidence
       title: RetryTransactionItem
-    RetryReport:
-      properties:
-        address:
-          type: string
-          title: Address
-        failed_transactions_analyzed:
-          type: integer
-          title: Failed Transactions Analyzed
-        retryable_count:
-          type: integer
-          title: Retryable Count
-        retry_transactions:
-          items:
-            $ref: '#/components/schemas/RetryTransactionItem'
-          type: array
-          title: Retry Transactions
-        total_estimated_retry_cost_usd:
-          type: number
-          title: Total Estimated Retry Cost Usd
-        potential_value_recovered_usd:
-          type: number
-          title: Potential Value Recovered Usd
-        analyzed_at:
-          type: string
-          title: Analyzed At
-      type: object
-      required:
-      - address
-      - failed_transactions_analyzed
-      - retryable_count
-      - retry_transactions
-      - total_estimated_retry_cost_usd
-      - potential_value_recovered_usd
-      - analyzed_at
-      title: RetryReport
-    RetryPreviewResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        address:
-          type: string
-          title: Address
-        failed_transactions_analyzed:
-          type: integer
-          title: Failed Transactions Analyzed
-        retryable_count:
-          type: integer
-          title: Retryable Count
-        total_estimated_retry_cost_usd:
-          type: number
-          title: Total Estimated Retry Cost Usd
-        potential_value_recovered_usd:
-          type: number
-          title: Potential Value Recovered Usd
-        message:
-          type: string
-          title: Message
-      type: object
-      required:
-      - status
-      - address
-      - failed_transactions_analyzed
-      - retryable_count
-      - total_estimated_retry_cost_usd
-      - potential_value_recovered_usd
-      - message
-      title: RetryPreviewResponse
-    RetryResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        report:
-          $ref: '#/components/schemas/RetryReport'
-      type: object
-      required:
-      - status
-      - report
-      title: RetryResponse
-    OptimizedTransaction:
-      properties:
-        to:
-          type: string
-          title: To
-        data:
-          type: string
-          title: Data
-        value:
-          type: string
-          title: Value
-        gas_limit:
-          type: string
-          title: Gas Limit
-        max_fee_per_gas:
-          type: string
-          title: Max Fee Per Gas
-        max_priority_fee_per_gas:
-          type: string
-          title: Max Priority Fee Per Gas
-      type: object
-      required:
-      - to
-      - data
-      - value
-      - gas_limit
-      - max_fee_per_gas
-      - max_priority_fee_per_gas
-      title: OptimizedTransaction
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     GasOptimizationReport:
       properties:
         address:
@@ -368,18 +246,6 @@ components:
       - eth_price_usd
       - analyzed_at
       title: GasOptimizationReport
-    OptimizeResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        report:
-          $ref: '#/components/schemas/GasOptimizationReport'
-      type: object
-      required:
-      - status
-      - report
-      title: OptimizeResponse
     TransactionTypeOptimization:
       properties:
         contract:
@@ -437,6 +303,133 @@ components:
       - wasted_gas_eth
       - wasted_gas_usd
       title: TransactionTypeOptimization
-x-refined-from:
-- agenthealthmonitor-xyz-openapi.json
-- agenthealthmonitor-xyz-openapi.yml
+    RetryPreviewResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        failed_transactions_analyzed:
+          type: integer
+          title: Failed Transactions Analyzed
+        retryable_count:
+          type: integer
+          title: Retryable Count
+        total_estimated_retry_cost_usd:
+          type: number
+          title: Total Estimated Retry Cost Usd
+        potential_value_recovered_usd:
+          type: number
+          title: Potential Value Recovered Usd
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - status
+      - address
+      - failed_transactions_analyzed
+      - retryable_count
+      - total_estimated_retry_cost_usd
+      - potential_value_recovered_usd
+      - message
+      title: RetryPreviewResponse
+    OptimizeResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/GasOptimizationReport'
+      type: object
+      required:
+      - status
+      - report
+      title: OptimizeResponse
+    RetryResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/RetryReport'
+      type: object
+      required:
+      - status
+      - report
+      title: RetryResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction
+    RetryReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        failed_transactions_analyzed:
+          type: integer
+          title: Failed Transactions Analyzed
+        retryable_count:
+          type: integer
+          title: Retryable Count
+        retry_transactions:
+          items:
+            $ref: '#/components/schemas/RetryTransactionItem'
+          type: array
+          title: Retry Transactions
+        total_estimated_retry_cost_usd:
+          type: number
+          title: Total Estimated Retry Cost Usd
+        potential_value_recovered_usd:
+          type: number
+          title: Potential Value Recovered Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - failed_transactions_analyzed
+      - retryable_count
+      - retry_transactions
+      - total_estimated_retry_cost_usd
+      - potential_value_recovered_usd
+      - analyzed_at
+      title: RetryReport

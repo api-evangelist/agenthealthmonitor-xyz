@@ -1,17 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Agenthealthmonitor Xyz Alerts API
-  version: 1.8.0
+  title: Agent Health Monitor Alerts API
+  description: Wallet intelligence API for autonomous agents on Base L2.
   contact:
     name: AHM Support
     url: https://agenthealthmonitor.xyz/
   license:
     name: Proprietary
-  description: 'Operations tagged Alerts across 2 of this provider''s published API definitions: agenthealthmonitor-xyz-openapi.json, agenthealthmonitor-xyz-openapi.yml. Each path carries the servers of the definition it was published in.'
-servers:
-- url: https://agenthealthmonitor.xyz
-  description: Production
-  x-apievangelist-note: 'Added by API Evangelist. The provider-served openapi.json at https://agenthealthmonitor.xyz/openapi.json declares no servers[]; the base is stated in the provider docs (docs.agenthealthmonitor.xyz API Quick Start: curl https://agenthealthmonitor.xyz/ahs/...) and in the README of github.com/moonshot-cyber/agent-health-monitor ("Base URL https://agenthealthmonitor.xyz"). Everything else in this file is the provider spec verbatim, converted from JSON to YAML.'
+  version: 1.8.0
 tags:
 - name: Alerts
   description: Subscribe wallets to automated health monitoring with webhook alerts. Health checks run every 6 hours; alerts fire when configurable thresholds are breached.
@@ -144,27 +140,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ConfigureRequest:
-      properties:
-        address:
-          type: string
-          title: Address
-        webhook_url:
-          type: string
-          title: Webhook Url
-        webhook_type:
-          type: string
-          title: Webhook Type
-          default: generic
-        thresholds:
-          anyOf:
-          - $ref: '#/components/schemas/AlertThresholds'
-          - type: 'null'
-      type: object
-      required:
-      - address
-      - webhook_url
-      title: ConfigureRequest
     ValidationError:
       properties:
         loc:
@@ -191,6 +166,27 @@ components:
       - msg
       - type
       title: ValidationError
+    ConfigureRequest:
+      properties:
+        address:
+          type: string
+          title: Address
+        webhook_url:
+          type: string
+          title: Webhook Url
+        webhook_type:
+          type: string
+          title: Webhook Type
+          default: generic
+        thresholds:
+          anyOf:
+          - $ref: '#/components/schemas/AlertThresholds'
+          - type: 'null'
+      type: object
+      required:
+      - address
+      - webhook_url
+      title: ConfigureRequest
     HTTPValidationError:
       properties:
         detail:
@@ -219,6 +215,3 @@ components:
           title: Waste Usd
       type: object
       title: AlertThresholds
-x-refined-from:
-- agenthealthmonitor-xyz-openapi.json
-- agenthealthmonitor-xyz-openapi.yml
