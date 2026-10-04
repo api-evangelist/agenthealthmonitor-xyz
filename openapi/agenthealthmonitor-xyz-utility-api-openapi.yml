@@ -52,6 +52,30 @@ paths:
               schema: {}
 components:
   schemas:
+    ChatRequest:
+      properties:
+        message:
+          type: string
+          title: Message
+        context:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Context
+      type: object
+      required:
+      - message
+      title: ChatRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     ValidationError:
       properties:
         loc:
@@ -78,27 +102,3 @@ components:
       - msg
       - type
       title: ValidationError
-    ChatRequest:
-      properties:
-        message:
-          type: string
-          title: Message
-        context:
-          anyOf:
-          - additionalProperties: true
-            type: object
-          - type: 'null'
-          title: Context
-      type: object
-      required:
-      - message
-      title: ChatRequest
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError

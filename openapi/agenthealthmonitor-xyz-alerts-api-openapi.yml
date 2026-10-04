@@ -140,6 +140,36 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ConfigureRequest:
+      properties:
+        address:
+          type: string
+          title: Address
+        webhook_url:
+          type: string
+          title: Webhook Url
+        webhook_type:
+          type: string
+          title: Webhook Type
+          default: generic
+        thresholds:
+          anyOf:
+          - $ref: '#/components/schemas/AlertThresholds'
+          - type: 'null'
+      type: object
+      required:
+      - address
+      - webhook_url
+      title: ConfigureRequest
     ValidationError:
       properties:
         loc:
@@ -166,36 +196,6 @@ components:
       - msg
       - type
       title: ValidationError
-    ConfigureRequest:
-      properties:
-        address:
-          type: string
-          title: Address
-        webhook_url:
-          type: string
-          title: Webhook Url
-        webhook_type:
-          type: string
-          title: Webhook Type
-          default: generic
-        thresholds:
-          anyOf:
-          - $ref: '#/components/schemas/AlertThresholds'
-          - type: 'null'
-      type: object
-      required:
-      - address
-      - webhook_url
-      title: ConfigureRequest
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     AlertThresholds:
       properties:
         health_score:

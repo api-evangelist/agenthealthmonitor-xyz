@@ -143,32 +143,15 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ValidationError:
+    HTTPValidationError:
       properties:
-        loc:
+        detail:
           items:
-            anyOf:
-            - type: string
-            - type: integer
+            $ref: '#/components/schemas/ValidationError'
           type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
+          title: Detail
       type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
+      title: HTTPValidationError
     RetryTransactionItem:
       properties:
         original_tx_hash:
@@ -193,59 +176,18 @@ components:
       - estimated_gas_cost_usd
       - confidence
       title: RetryTransactionItem
-    GasOptimizationReport:
+    RetryResponse:
       properties:
-        address:
+        status:
           type: string
-          title: Address
-        total_transactions_analyzed:
-          type: integer
-          title: Total Transactions Analyzed
-        current_monthly_gas_usd:
-          type: number
-          title: Current Monthly Gas Usd
-        optimized_monthly_gas_usd:
-          type: number
-          title: Optimized Monthly Gas Usd
-        estimated_monthly_savings_usd:
-          type: number
-          title: Estimated Monthly Savings Usd
-        total_wasted_gas_eth:
-          type: number
-          title: Total Wasted Gas Eth
-        total_wasted_gas_usd:
-          type: number
-          title: Total Wasted Gas Usd
-        tx_types:
-          items:
-            $ref: '#/components/schemas/TransactionTypeOptimization'
-          type: array
-          title: Tx Types
-        recommendations:
-          items:
-            type: string
-          type: array
-          title: Recommendations
-        eth_price_usd:
-          type: number
-          title: Eth Price Usd
-        analyzed_at:
-          type: string
-          title: Analyzed At
+          title: Status
+        report:
+          $ref: '#/components/schemas/RetryReport'
       type: object
       required:
-      - address
-      - total_transactions_analyzed
-      - current_monthly_gas_usd
-      - optimized_monthly_gas_usd
-      - estimated_monthly_savings_usd
-      - total_wasted_gas_eth
-      - total_wasted_gas_usd
-      - tx_types
-      - recommendations
-      - eth_price_usd
-      - analyzed_at
-      title: GasOptimizationReport
+      - status
+      - report
+      title: RetryResponse
     TransactionTypeOptimization:
       properties:
         contract:
@@ -303,6 +245,18 @@ components:
       - wasted_gas_eth
       - wasted_gas_usd
       title: TransactionTypeOptimization
+    OptimizeResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        report:
+          $ref: '#/components/schemas/GasOptimizationReport'
+      type: object
+      required:
+      - status
+      - report
+      title: OptimizeResponse
     RetryPreviewResponse:
       properties:
         status:
@@ -336,68 +290,6 @@ components:
       - potential_value_recovered_usd
       - message
       title: RetryPreviewResponse
-    OptimizeResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        report:
-          $ref: '#/components/schemas/GasOptimizationReport'
-      type: object
-      required:
-      - status
-      - report
-      title: OptimizeResponse
-    RetryResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        report:
-          $ref: '#/components/schemas/RetryReport'
-      type: object
-      required:
-      - status
-      - report
-      title: RetryResponse
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    OptimizedTransaction:
-      properties:
-        to:
-          type: string
-          title: To
-        data:
-          type: string
-          title: Data
-        value:
-          type: string
-          title: Value
-        gas_limit:
-          type: string
-          title: Gas Limit
-        max_fee_per_gas:
-          type: string
-          title: Max Fee Per Gas
-        max_priority_fee_per_gas:
-          type: string
-          title: Max Priority Fee Per Gas
-      type: object
-      required:
-      - to
-      - data
-      - value
-      - gas_limit
-      - max_fee_per_gas
-      - max_priority_fee_per_gas
-      title: OptimizedTransaction
     RetryReport:
       properties:
         address:
@@ -433,3 +325,111 @@ components:
       - potential_value_recovered_usd
       - analyzed_at
       title: RetryReport
+    GasOptimizationReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        total_transactions_analyzed:
+          type: integer
+          title: Total Transactions Analyzed
+        current_monthly_gas_usd:
+          type: number
+          title: Current Monthly Gas Usd
+        optimized_monthly_gas_usd:
+          type: number
+          title: Optimized Monthly Gas Usd
+        estimated_monthly_savings_usd:
+          type: number
+          title: Estimated Monthly Savings Usd
+        total_wasted_gas_eth:
+          type: number
+          title: Total Wasted Gas Eth
+        total_wasted_gas_usd:
+          type: number
+          title: Total Wasted Gas Usd
+        tx_types:
+          items:
+            $ref: '#/components/schemas/TransactionTypeOptimization'
+          type: array
+          title: Tx Types
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - total_transactions_analyzed
+      - current_monthly_gas_usd
+      - optimized_monthly_gas_usd
+      - estimated_monthly_savings_usd
+      - total_wasted_gas_eth
+      - total_wasted_gas_usd
+      - tx_types
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: GasOptimizationReport
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction

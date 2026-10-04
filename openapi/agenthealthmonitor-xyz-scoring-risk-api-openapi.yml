@@ -196,32 +196,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
     PremiumRiskResponse:
       properties:
         risk_score:
@@ -261,6 +235,159 @@ components:
       - nansen_labels
       - nansen_available
       title: PremiumRiskResponse
+    RelatedWalletsResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        chain:
+          type: string
+          title: Chain
+        related_wallets:
+          items:
+            $ref: '#/components/schemas/RelatedWallet'
+          type: array
+          title: Related Wallets
+          default: []
+        total_related:
+          type: integer
+          title: Total Related
+          default: 0
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+          default: false
+      type: object
+      required:
+      - status
+      - address
+      - chain
+      title: RelatedWalletsResponse
+    NansenLabel:
+      properties:
+        label:
+          type: string
+          title: Label
+          description: Nansen wallet label
+          examples:
+          - Smart Money
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: Label category
+          examples:
+          - behavioral
+        definition:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Definition
+          description: Human-readable label definition
+          examples:
+          - Wallet that consistently trades profitably
+      type: object
+      required:
+      - label
+      title: NansenLabel
+    RelatedWallet:
+      properties:
+        address:
+          type: string
+          title: Address
+        label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Label
+        relation:
+          type: string
+          title: Relation
+        chain:
+          type: string
+          title: Chain
+        transaction_hash:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Transaction Hash
+        block_timestamp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Block Timestamp
+      type: object
+      required:
+      - address
+      - relation
+      - chain
+      title: RelatedWallet
+    RiskResponse:
+      properties:
+        risk_score:
+          type: integer
+          title: Risk Score
+          description: Risk score from 0 (safe) to 100 (dangerous)
+          examples:
+          - 32
+        risk_level:
+          type: string
+          title: Risk Level
+          description: 'Risk classification: LOW, MEDIUM, HIGH, or CRITICAL'
+          examples:
+          - LOW
+        verdict:
+          type: string
+          title: Verdict
+          description: One-line human-readable risk assessment
+          examples:
+          - Low-risk wallet with normal transaction patterns
+      type: object
+      required:
+      - risk_score
+      - risk_level
+      - verdict
+      title: RiskResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    CounterpartyResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        counterparties:
+          items:
+            $ref: '#/components/schemas/Counterparty'
+          type: array
+          title: Counterparties
+          default: []
+        total_counterparties:
+          type: integer
+          title: Total Counterparties
+          default: 0
+        nansen_available:
+          type: boolean
+          title: Nansen Available
+          default: false
+      type: object
+      required:
+      - status
+      - address
+      title: CounterpartyResponse
     OperationalHealth:
       properties:
         tx_failure_rate_1hr:
@@ -297,69 +424,6 @@ components:
           default: ''
       type: object
       title: OperationalHealth
-    NansenLabel:
-      properties:
-        label:
-          type: string
-          title: Label
-          description: Nansen wallet label
-          examples:
-          - Smart Money
-        category:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Category
-          description: Label category
-          examples:
-          - behavioral
-        definition:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Definition
-          description: Human-readable label definition
-          examples:
-          - Wallet that consistently trades profitably
-      type: object
-      required:
-      - label
-      title: NansenLabel
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    RiskResponse:
-      properties:
-        risk_score:
-          type: integer
-          title: Risk Score
-          description: Risk score from 0 (safe) to 100 (dangerous)
-          examples:
-          - 32
-        risk_level:
-          type: string
-          title: Risk Level
-          description: 'Risk classification: LOW, MEDIUM, HIGH, or CRITICAL'
-          examples:
-          - LOW
-        verdict:
-          type: string
-          title: Verdict
-          description: One-line human-readable risk assessment
-          examples:
-          - Low-risk wallet with normal transaction patterns
-      type: object
-      required:
-      - risk_score
-      - risk_level
-      - verdict
-      title: RiskResponse
     PnlSummary:
       properties:
         realized_pnl_usd:
@@ -390,64 +454,6 @@ components:
           default: []
       type: object
       title: PnlSummary
-    RelatedWalletsResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        address:
-          type: string
-          title: Address
-        chain:
-          type: string
-          title: Chain
-        related_wallets:
-          items:
-            $ref: '#/components/schemas/RelatedWallet'
-          type: array
-          title: Related Wallets
-          default: []
-        total_related:
-          type: integer
-          title: Total Related
-          default: 0
-        nansen_available:
-          type: boolean
-          title: Nansen Available
-          default: false
-      type: object
-      required:
-      - status
-      - address
-      - chain
-      title: RelatedWalletsResponse
-    CounterpartyResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        address:
-          type: string
-          title: Address
-        counterparties:
-          items:
-            $ref: '#/components/schemas/Counterparty'
-          type: array
-          title: Counterparties
-          default: []
-        total_counterparties:
-          type: integer
-          title: Total Counterparties
-          default: 0
-        nansen_available:
-          type: boolean
-          title: Nansen Available
-          default: false
-      type: object
-      required:
-      - status
-      - address
-      title: CounterpartyResponse
     PnlTokenSummary:
       properties:
         token_symbol:
@@ -469,38 +475,32 @@ components:
       - realized_pnl
       - realized_roi
       title: PnlTokenSummary
-    RelatedWallet:
+    ValidationError:
       properties:
-        address:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
           type: string
-          title: Address
-        label:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Label
-        relation:
+          title: Message
+        type:
           type: string
-          title: Relation
-        chain:
-          type: string
-          title: Chain
-        transaction_hash:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Transaction Hash
-        block_timestamp:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Block Timestamp
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
       required:
-      - address
-      - relation
-      - chain
-      title: RelatedWallet
+      - loc
+      - msg
+      - type
+      title: ValidationError
     Counterparty:
       properties:
         address:
