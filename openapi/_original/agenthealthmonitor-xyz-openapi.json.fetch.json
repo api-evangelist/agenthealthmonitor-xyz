@@ -1,0 +1,12 @@
+{
+ "url": "https://agenthealthmonitor.xyz/openapi.json",
+ "requested_url": "https://agenthealthmonitor.xyz/openapi.json",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 94472,
+ "sha256": "65e2af745e5ef9d47cb528a20b4f675ec93de8818330d356336f73c315a736ff",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
