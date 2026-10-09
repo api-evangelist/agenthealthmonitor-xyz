@@ -1,4 +1,4 @@
-generated: '2026-09-19'
+generated: '2026-09-23'
 method: generated
 source: openapi/agenthealthmonitor-xyz-openapi.yml, openapi/agenthealthmonitor-xyz-verify-openapi.yml
 description: Recommended x-agentic-access execution contracts, classified heuristically from
@@ -7,11 +7,11 @@ description: Recommended x-agentic-access execution contracts, classified heuris
 summary:
   operations: 80
   by_action_class:
-    connected: 64
-    acting: 16
+    connected: 66
+    acting: 14
   by_consequence:
-    read: 64
-    write: 16
+    read: 66
+    write: 14
   human_in_the_loop_required: 0
 operations:
 - path: /
@@ -414,18 +414,12 @@ operations:
   method: post
   operationId: get_wash_report_wash__address__post
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /ahs/{address}
   method: get
   operationId: get_ahs_report_ahs__address__get
@@ -476,18 +470,12 @@ operations:
   method: post
   operationId: get_ahs_batch_ahs_batch_post
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /report-card/{address}
   method: get
   operationId: get_report_card_report_card__address__get
