@@ -191,15 +191,26 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HTTPValidationError:
+    ShieldSubscribeRequest:
       properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
+        tier:
+          type: string
+          title: Tier
+          description: 'Shield tier: starter, pro, or enterprise'
+        success_url:
+          type: string
+          title: Success Url
+          description: URL to redirect after successful checkout
+          default: https://agenthealthmonitor.xyz/shield?subscribed=true
+        cancel_url:
+          type: string
+          title: Cancel Url
+          description: URL to redirect if checkout is cancelled
+          default: https://agenthealthmonitor.xyz/shield
       type: object
-      title: HTTPValidationError
+      required:
+      - tier
+      title: ShieldSubscribeRequest
     TestWebhookRequest:
       properties:
         email:
@@ -221,26 +232,6 @@ components:
       required:
       - email
       title: TestWebhookRequest
-    ShieldSubscribeRequest:
-      properties:
-        tier:
-          type: string
-          title: Tier
-          description: 'Shield tier: starter, pro, or enterprise'
-        success_url:
-          type: string
-          title: Success Url
-          description: URL to redirect after successful checkout
-          default: https://agenthealthmonitor.xyz/shield?subscribed=true
-        cancel_url:
-          type: string
-          title: Cancel Url
-          description: URL to redirect if checkout is cancelled
-          default: https://agenthealthmonitor.xyz/shield
-      type: object
-      required:
-      - tier
-      title: ShieldSubscribeRequest
     ValidationError:
       properties:
         loc:
@@ -267,3 +258,12 @@ components:
       - msg
       - type
       title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError

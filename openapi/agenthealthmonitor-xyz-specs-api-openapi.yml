@@ -34,6 +34,19 @@ paths:
       - Specs
 components:
   schemas:
+    SpecResponse:
+      properties:
+        spec_id:
+          type: string
+          title: Spec Id
+        spec_hash:
+          type: string
+          title: Spec Hash
+      type: object
+      required:
+      - spec_id
+      - spec_hash
+      title: SpecResponse
     SpecRequest:
       properties:
         client_addr:
@@ -73,15 +86,6 @@ components:
       - client_addr
       - spec_text
       title: SpecRequest
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     ValidationError:
       properties:
         loc:
@@ -108,16 +112,12 @@ components:
       - msg
       - type
       title: ValidationError
-    SpecResponse:
+    HTTPValidationError:
       properties:
-        spec_id:
-          type: string
-          title: Spec Id
-        spec_hash:
-          type: string
-          title: Spec Hash
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
       type: object
-      required:
-      - spec_id
-      - spec_hash
-      title: SpecResponse
+      title: HTTPValidationError

@@ -140,15 +140,25 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HTTPValidationError:
+    AlertThresholds:
       properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
+        health_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Health Score
+        failure_rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Failure Rate
+        waste_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Waste Usd
       type: object
-      title: HTTPValidationError
+      title: AlertThresholds
     ConfigureRequest:
       properties:
         address:
@@ -196,22 +206,12 @@ components:
       - msg
       - type
       title: ValidationError
-    AlertThresholds:
+    HTTPValidationError:
       properties:
-        health_score:
-          anyOf:
-          - type: number
-          - type: 'null'
-          title: Health Score
-        failure_rate:
-          anyOf:
-          - type: number
-          - type: 'null'
-          title: Failure Rate
-        waste_usd:
-          anyOf:
-          - type: number
-          - type: 'null'
-          title: Waste Usd
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
       type: object
-      title: AlertThresholds
+      title: HTTPValidationError

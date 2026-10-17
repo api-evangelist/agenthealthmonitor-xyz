@@ -100,6 +100,173 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    GasOptimizationReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        total_transactions_analyzed:
+          type: integer
+          title: Total Transactions Analyzed
+        current_monthly_gas_usd:
+          type: number
+          title: Current Monthly Gas Usd
+        optimized_monthly_gas_usd:
+          type: number
+          title: Optimized Monthly Gas Usd
+        estimated_monthly_savings_usd:
+          type: number
+          title: Estimated Monthly Savings Usd
+        total_wasted_gas_eth:
+          type: number
+          title: Total Wasted Gas Eth
+        total_wasted_gas_usd:
+          type: number
+          title: Total Wasted Gas Usd
+        tx_types:
+          items:
+            $ref: '#/components/schemas/TransactionTypeOptimization'
+          type: array
+          title: Tx Types
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - total_transactions_analyzed
+      - current_monthly_gas_usd
+      - optimized_monthly_gas_usd
+      - estimated_monthly_savings_usd
+      - total_wasted_gas_eth
+      - total_wasted_gas_usd
+      - tx_types
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: GasOptimizationReport
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction
+    ProtectionReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        risk_level:
+          type: string
+          title: Risk Level
+        health_score:
+          type: number
+          title: Health Score
+        services_run:
+          items:
+            type: string
+          type: array
+          title: Services Run
+        summary:
+          $ref: '#/components/schemas/ProtectionSummaryModel'
+        health_report:
+          $ref: '#/components/schemas/HealthReport'
+        gas_optimization:
+          anyOf:
+          - $ref: '#/components/schemas/GasOptimizationReport'
+          - type: 'null'
+        retry_transactions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RetryTransactionItem'
+            type: array
+          - type: 'null'
+          title: Retry Transactions
+        recommended_actions:
+          items:
+            $ref: '#/components/schemas/ProtectionActionItem'
+          type: array
+          title: Recommended Actions
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - risk_level
+      - health_score
+      - services_run
+      - summary
+      - health_report
+      - recommended_actions
+      - analyzed_at
+      title: ProtectionReport
+    ProtectionPreviewResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        address:
+          type: string
+          title: Address
+        risk_level:
+          type: string
+          title: Risk Level
+        health_score:
+          type: number
+          title: Health Score
+        services_recommended:
+          items:
+            type: string
+          type: array
+          title: Services Recommended
+        estimated_issues:
+          type: integer
+          title: Estimated Issues
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - status
+      - address
+      - risk_level
+      - health_score
+      - services_recommended
+      - estimated_issues
+      - message
+      title: ProtectionPreviewResponse
     HealthReport:
       properties:
         address:
@@ -259,6 +426,40 @@ components:
       - eth_price_usd
       - analyzed_at
       title: HealthReport
+    ProtectionActionItem:
+      properties:
+        priority:
+          type: integer
+          title: Priority
+        action:
+          type: string
+          title: Action
+        description:
+          type: string
+          title: Description
+        potential_value_usd:
+          type: number
+          title: Potential Value Usd
+          default: 0.0
+        potential_savings_monthly_usd:
+          type: number
+          title: Potential Savings Monthly Usd
+          default: 0.0
+      type: object
+      required:
+      - priority
+      - action
+      - description
+      title: ProtectionActionItem
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
     ProtectionSummaryModel:
       properties:
         total_issues_found:
@@ -280,103 +481,6 @@ components:
       - retry_transactions_ready
       - estimated_retry_cost_usd
       title: ProtectionSummaryModel
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    ProtectionPreviewResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        address:
-          type: string
-          title: Address
-        risk_level:
-          type: string
-          title: Risk Level
-        health_score:
-          type: number
-          title: Health Score
-        services_recommended:
-          items:
-            type: string
-          type: array
-          title: Services Recommended
-        estimated_issues:
-          type: integer
-          title: Estimated Issues
-        message:
-          type: string
-          title: Message
-      type: object
-      required:
-      - status
-      - address
-      - risk_level
-      - health_score
-      - services_recommended
-      - estimated_issues
-      - message
-      title: ProtectionPreviewResponse
-    RetryTransactionItem:
-      properties:
-        original_tx_hash:
-          type: string
-          title: Original Tx Hash
-        failure_reason:
-          type: string
-          title: Failure Reason
-        optimized_transaction:
-          $ref: '#/components/schemas/OptimizedTransaction'
-        estimated_gas_cost_usd:
-          type: number
-          title: Estimated Gas Cost Usd
-        confidence:
-          type: string
-          title: Confidence
-      type: object
-      required:
-      - original_tx_hash
-      - failure_reason
-      - optimized_transaction
-      - estimated_gas_cost_usd
-      - confidence
-      title: RetryTransactionItem
-    OptimizedTransaction:
-      properties:
-        to:
-          type: string
-          title: To
-        data:
-          type: string
-          title: Data
-        value:
-          type: string
-          title: Value
-        gas_limit:
-          type: string
-          title: Gas Limit
-        max_fee_per_gas:
-          type: string
-          title: Max Fee Per Gas
-        max_priority_fee_per_gas:
-          type: string
-          title: Max Priority Fee Per Gas
-      type: object
-      required:
-      - to
-      - data
-      - value
-      - gas_limit
-      - max_fee_per_gas
-      - max_priority_fee_per_gas
-      title: OptimizedTransaction
     TransactionTypeOptimization:
       properties:
         contract:
@@ -434,85 +538,6 @@ components:
       - wasted_gas_eth
       - wasted_gas_usd
       title: TransactionTypeOptimization
-    Recommendation:
-      properties:
-        category:
-          type: string
-          title: Category
-          description: Issue category (gas, nonce, failure, balance)
-          examples:
-          - gas
-        severity:
-          type: string
-          title: Severity
-          description: 'Severity level: critical, high, medium, or info'
-          examples:
-          - high
-        message:
-          type: string
-          title: Message
-          description: Actionable recommendation text
-          examples:
-          - Gas waste detected — 12% of gas spent on reverted transactions
-      type: object
-      required:
-      - category
-      - severity
-      - message
-      title: Recommendation
-    GasOptimizationReport:
-      properties:
-        address:
-          type: string
-          title: Address
-        total_transactions_analyzed:
-          type: integer
-          title: Total Transactions Analyzed
-        current_monthly_gas_usd:
-          type: number
-          title: Current Monthly Gas Usd
-        optimized_monthly_gas_usd:
-          type: number
-          title: Optimized Monthly Gas Usd
-        estimated_monthly_savings_usd:
-          type: number
-          title: Estimated Monthly Savings Usd
-        total_wasted_gas_eth:
-          type: number
-          title: Total Wasted Gas Eth
-        total_wasted_gas_usd:
-          type: number
-          title: Total Wasted Gas Usd
-        tx_types:
-          items:
-            $ref: '#/components/schemas/TransactionTypeOptimization'
-          type: array
-          title: Tx Types
-        recommendations:
-          items:
-            type: string
-          type: array
-          title: Recommendations
-        eth_price_usd:
-          type: number
-          title: Eth Price Usd
-        analyzed_at:
-          type: string
-          title: Analyzed At
-      type: object
-      required:
-      - address
-      - total_transactions_analyzed
-      - current_monthly_gas_usd
-      - optimized_monthly_gas_usd
-      - estimated_monthly_savings_usd
-      - total_wasted_gas_eth
-      - total_wasted_gas_usd
-      - tx_types
-      - recommendations
-      - eth_price_usd
-      - analyzed_at
-      title: GasOptimizationReport
     ValidationError:
       properties:
         loc:
@@ -539,31 +564,30 @@ components:
       - msg
       - type
       title: ValidationError
-    ProtectionActionItem:
+    RetryTransactionItem:
       properties:
-        priority:
-          type: integer
-          title: Priority
-        action:
+        original_tx_hash:
           type: string
-          title: Action
-        description:
+          title: Original Tx Hash
+        failure_reason:
           type: string
-          title: Description
-        potential_value_usd:
+          title: Failure Reason
+        optimized_transaction:
+          $ref: '#/components/schemas/OptimizedTransaction'
+        estimated_gas_cost_usd:
           type: number
-          title: Potential Value Usd
-          default: 0.0
-        potential_savings_monthly_usd:
-          type: number
-          title: Potential Savings Monthly Usd
-          default: 0.0
+          title: Estimated Gas Cost Usd
+        confidence:
+          type: string
+          title: Confidence
       type: object
       required:
-      - priority
-      - action
-      - description
-      title: ProtectionActionItem
+      - original_tx_hash
+      - failure_reason
+      - optimized_transaction
+      - estimated_gas_cost_usd
+      - confidence
+      title: RetryTransactionItem
     ProtectionResponse:
       properties:
         status:
@@ -576,53 +600,29 @@ components:
       - status
       - report
       title: ProtectionResponse
-    ProtectionReport:
+    Recommendation:
       properties:
-        address:
+        category:
           type: string
-          title: Address
-        risk_level:
+          title: Category
+          description: Issue category (gas, nonce, failure, balance)
+          examples:
+          - gas
+        severity:
           type: string
-          title: Risk Level
-        health_score:
-          type: number
-          title: Health Score
-        services_run:
-          items:
-            type: string
-          type: array
-          title: Services Run
-        summary:
-          $ref: '#/components/schemas/ProtectionSummaryModel'
-        health_report:
-          $ref: '#/components/schemas/HealthReport'
-        gas_optimization:
-          anyOf:
-          - $ref: '#/components/schemas/GasOptimizationReport'
-          - type: 'null'
-        retry_transactions:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/RetryTransactionItem'
-            type: array
-          - type: 'null'
-          title: Retry Transactions
-        recommended_actions:
-          items:
-            $ref: '#/components/schemas/ProtectionActionItem'
-          type: array
-          title: Recommended Actions
-        analyzed_at:
+          title: Severity
+          description: 'Severity level: critical, high, medium, or info'
+          examples:
+          - high
+        message:
           type: string
-          title: Analyzed At
+          title: Message
+          description: Actionable recommendation text
+          examples:
+          - Gas waste detected — 12% of gas spent on reverted transactions
       type: object
       required:
-      - address
-      - risk_level
-      - health_score
-      - services_run
-      - summary
-      - health_report
-      - recommended_actions
-      - analyzed_at
-      title: ProtectionReport
+      - category
+      - severity
+      - message
+      title: Recommendation

@@ -143,6 +143,88 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    GasOptimizationReport:
+      properties:
+        address:
+          type: string
+          title: Address
+        total_transactions_analyzed:
+          type: integer
+          title: Total Transactions Analyzed
+        current_monthly_gas_usd:
+          type: number
+          title: Current Monthly Gas Usd
+        optimized_monthly_gas_usd:
+          type: number
+          title: Optimized Monthly Gas Usd
+        estimated_monthly_savings_usd:
+          type: number
+          title: Estimated Monthly Savings Usd
+        total_wasted_gas_eth:
+          type: number
+          title: Total Wasted Gas Eth
+        total_wasted_gas_usd:
+          type: number
+          title: Total Wasted Gas Usd
+        tx_types:
+          items:
+            $ref: '#/components/schemas/TransactionTypeOptimization'
+          type: array
+          title: Tx Types
+        recommendations:
+          items:
+            type: string
+          type: array
+          title: Recommendations
+        eth_price_usd:
+          type: number
+          title: Eth Price Usd
+        analyzed_at:
+          type: string
+          title: Analyzed At
+      type: object
+      required:
+      - address
+      - total_transactions_analyzed
+      - current_monthly_gas_usd
+      - optimized_monthly_gas_usd
+      - estimated_monthly_savings_usd
+      - total_wasted_gas_eth
+      - total_wasted_gas_usd
+      - tx_types
+      - recommendations
+      - eth_price_usd
+      - analyzed_at
+      title: GasOptimizationReport
+    OptimizedTransaction:
+      properties:
+        to:
+          type: string
+          title: To
+        data:
+          type: string
+          title: Data
+        value:
+          type: string
+          title: Value
+        gas_limit:
+          type: string
+          title: Gas Limit
+        max_fee_per_gas:
+          type: string
+          title: Max Fee Per Gas
+        max_priority_fee_per_gas:
+          type: string
+          title: Max Priority Fee Per Gas
+      type: object
+      required:
+      - to
+      - data
+      - value
+      - gas_limit
+      - max_fee_per_gas
+      - max_priority_fee_per_gas
+      title: OptimizedTransaction
     HTTPValidationError:
       properties:
         detail:
@@ -152,30 +234,41 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
-    RetryTransactionItem:
+    RetryReport:
       properties:
-        original_tx_hash:
+        address:
           type: string
-          title: Original Tx Hash
-        failure_reason:
-          type: string
-          title: Failure Reason
-        optimized_transaction:
-          $ref: '#/components/schemas/OptimizedTransaction'
-        estimated_gas_cost_usd:
+          title: Address
+        failed_transactions_analyzed:
+          type: integer
+          title: Failed Transactions Analyzed
+        retryable_count:
+          type: integer
+          title: Retryable Count
+        retry_transactions:
+          items:
+            $ref: '#/components/schemas/RetryTransactionItem'
+          type: array
+          title: Retry Transactions
+        total_estimated_retry_cost_usd:
           type: number
-          title: Estimated Gas Cost Usd
-        confidence:
+          title: Total Estimated Retry Cost Usd
+        potential_value_recovered_usd:
+          type: number
+          title: Potential Value Recovered Usd
+        analyzed_at:
           type: string
-          title: Confidence
+          title: Analyzed At
       type: object
       required:
-      - original_tx_hash
-      - failure_reason
-      - optimized_transaction
-      - estimated_gas_cost_usd
-      - confidence
-      title: RetryTransactionItem
+      - address
+      - failed_transactions_analyzed
+      - retryable_count
+      - retry_transactions
+      - total_estimated_retry_cost_usd
+      - potential_value_recovered_usd
+      - analyzed_at
+      title: RetryReport
     RetryResponse:
       properties:
         status:
@@ -245,18 +338,6 @@ components:
       - wasted_gas_eth
       - wasted_gas_usd
       title: TransactionTypeOptimization
-    OptimizeResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-        report:
-          $ref: '#/components/schemas/GasOptimizationReport'
-      type: object
-      required:
-      - status
-      - report
-      title: OptimizeResponse
     RetryPreviewResponse:
       properties:
         status:
@@ -290,94 +371,18 @@ components:
       - potential_value_recovered_usd
       - message
       title: RetryPreviewResponse
-    RetryReport:
+    OptimizeResponse:
       properties:
-        address:
+        status:
           type: string
-          title: Address
-        failed_transactions_analyzed:
-          type: integer
-          title: Failed Transactions Analyzed
-        retryable_count:
-          type: integer
-          title: Retryable Count
-        retry_transactions:
-          items:
-            $ref: '#/components/schemas/RetryTransactionItem'
-          type: array
-          title: Retry Transactions
-        total_estimated_retry_cost_usd:
-          type: number
-          title: Total Estimated Retry Cost Usd
-        potential_value_recovered_usd:
-          type: number
-          title: Potential Value Recovered Usd
-        analyzed_at:
-          type: string
-          title: Analyzed At
+          title: Status
+        report:
+          $ref: '#/components/schemas/GasOptimizationReport'
       type: object
       required:
-      - address
-      - failed_transactions_analyzed
-      - retryable_count
-      - retry_transactions
-      - total_estimated_retry_cost_usd
-      - potential_value_recovered_usd
-      - analyzed_at
-      title: RetryReport
-    GasOptimizationReport:
-      properties:
-        address:
-          type: string
-          title: Address
-        total_transactions_analyzed:
-          type: integer
-          title: Total Transactions Analyzed
-        current_monthly_gas_usd:
-          type: number
-          title: Current Monthly Gas Usd
-        optimized_monthly_gas_usd:
-          type: number
-          title: Optimized Monthly Gas Usd
-        estimated_monthly_savings_usd:
-          type: number
-          title: Estimated Monthly Savings Usd
-        total_wasted_gas_eth:
-          type: number
-          title: Total Wasted Gas Eth
-        total_wasted_gas_usd:
-          type: number
-          title: Total Wasted Gas Usd
-        tx_types:
-          items:
-            $ref: '#/components/schemas/TransactionTypeOptimization'
-          type: array
-          title: Tx Types
-        recommendations:
-          items:
-            type: string
-          type: array
-          title: Recommendations
-        eth_price_usd:
-          type: number
-          title: Eth Price Usd
-        analyzed_at:
-          type: string
-          title: Analyzed At
-      type: object
-      required:
-      - address
-      - total_transactions_analyzed
-      - current_monthly_gas_usd
-      - optimized_monthly_gas_usd
-      - estimated_monthly_savings_usd
-      - total_wasted_gas_eth
-      - total_wasted_gas_usd
-      - tx_types
-      - recommendations
-      - eth_price_usd
-      - analyzed_at
-      title: GasOptimizationReport
+      - status
+      - report
+      title: OptimizeResponse
     ValidationError:
       properties:
         loc:
@@ -404,32 +409,27 @@ components:
       - msg
       - type
       title: ValidationError
-    OptimizedTransaction:
+    RetryTransactionItem:
       properties:
-        to:
+        original_tx_hash:
           type: string
-          title: To
-        data:
+          title: Original Tx Hash
+        failure_reason:
           type: string
-          title: Data
-        value:
+          title: Failure Reason
+        optimized_transaction:
+          $ref: '#/components/schemas/OptimizedTransaction'
+        estimated_gas_cost_usd:
+          type: number
+          title: Estimated Gas Cost Usd
+        confidence:
           type: string
-          title: Value
-        gas_limit:
-          type: string
-          title: Gas Limit
-        max_fee_per_gas:
-          type: string
-          title: Max Fee Per Gas
-        max_priority_fee_per_gas:
-          type: string
-          title: Max Priority Fee Per Gas
+          title: Confidence
       type: object
       required:
-      - to
-      - data
-      - value
-      - gas_limit
-      - max_fee_per_gas
-      - max_priority_fee_per_gas
-      title: OptimizedTransaction
+      - original_tx_hash
+      - failure_reason
+      - optimized_transaction
+      - estimated_gas_cost_usd
+      - confidence
+      title: RetryTransactionItem

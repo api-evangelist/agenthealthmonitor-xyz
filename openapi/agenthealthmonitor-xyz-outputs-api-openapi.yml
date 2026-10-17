@@ -70,15 +70,19 @@ components:
       - submitter_addr
       - provider_addr
       title: OutputRequest
-    HTTPValidationError:
+    OutputResponse:
       properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
+        verdict_id:
+          type: string
+          title: Verdict Id
+        status:
+          type: string
+          title: Status
       type: object
-      title: HTTPValidationError
+      required:
+      - verdict_id
+      - status
+      title: OutputResponse
     ValidationError:
       properties:
         loc:
@@ -105,16 +109,12 @@ components:
       - msg
       - type
       title: ValidationError
-    OutputResponse:
+    HTTPValidationError:
       properties:
-        verdict_id:
-          type: string
-          title: Verdict Id
-        status:
-          type: string
-          title: Status
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
       type: object
-      required:
-      - verdict_id
-      - status
-      title: OutputResponse
+      title: HTTPValidationError
